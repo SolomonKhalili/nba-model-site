@@ -1,0 +1,80 @@
+# Keeps the NBA model and its website live with nobody's computer on.
+# Lives in the PUBLIC website repo (SolomonKhalili/nba-model-site), where GitHub Actions minutes are free and
+# unlimited. The code and database stay in the PRIVATE repo (SolomonKhalili/nba-sports-model): this job downloads
+# them with a secret deploy key. The public log only says "updated" / "published"; the website's data is
+# encrypted and only the accounts' passwords unlock it.
+#   • 8 AM – 1 AM New York time: a run stays on for up to ~5.5 h (FanDuel every 3 min, full update every 15 min,
+#     website republished on any change). The timer starts a new one every 30 min; a new run waits for the current one.
+#   • 1 AM – 8 AM: one quick update an hour (opening lines, overnight injury news).
+name: live
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: "live (stay on) · once (one update)"
+        default: live
+
+concurrency:
+  group: live
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      TZ: America/New_York
+      SITE_DATA_KEY: ${{ secrets.SITE_DATA_KEY }}
+    steps:
+      - name: Which kind of run
+        id: kind
+        run: |
+          kind=live
+          [ "${{ github.event_name }}" = "workflow_dispatch" ] && kind="${{ inputs.kind }}"
+          h=$(date +%-H); m=$(date +%-M)
+          if [ "$kind" = "live" ] && [ "$h" -ge 1 ] && [ "$h" -lt 8 ]; then
+            # overnight: one update an hour (on the :00 timer only)
+            if [ "${{ github.event_name }}" = "schedule" ] && [ "$m" -ge 30 ]; then kind=skip; else kind=once; fi
+          fi
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"; echo "Run kind: $kind"
+
+      - name: Get the private code and saved data
+        if: steps.kind.outputs.kind != 'skip'
+        env:
+          KEY: ${{ secrets.PRIVATE_REPO_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$KEY" > ~/.ssh/app_key && chmod 600 ~/.ssh/app_key
+          echo "GIT_SSH_COMMAND=ssh -i $HOME/.ssh/app_key -o StrictHostKeyChecking=accept-new" >> "$GITHUB_ENV"
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/app_key -o StrictHostKeyChecking=accept-new"
+          git clone -q --depth 1 git@github.com:SolomonKhalili/nba-sports-model.git app
+          cd app && (git fetch -q --depth 1 origin state && git checkout -q FETCH_HEAD -- . || echo "no saved data yet")
+          git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "https://github.com/"
+          echo "ready"
+
+      - uses: actions/setup-python@v5
+        if: steps.kind.outputs.kind != 'skip'
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: app/requirements.txt
+
+      - name: Install
+        if: steps.kind.outputs.kind != 'skip'
+        run: pip install -q -r app/requirements.txt > /dev/null
+
+      - name: First time only - download every season
+        if: steps.kind.outputs.kind != 'skip' && hashFiles('app/nba_model.db') == ''
+        run: cd app && python data.py backfill > /dev/null && python backtest.py --save > /dev/null && echo "backfill done"
+
+      - name: Update the model and the website
+        if: steps.kind.outputs.kind != 'skip'
+        env:
+          SITE_REMOTE: https://github.com/${{ github.repository }}.git
+          STATE_REMOTE: git@github.com:SolomonKhalili/nba-sports-model.git
+        run: cd app && python -u cloud.py --${{ steps.kind.outputs.kind }} --out ../site_out 2>> run.log

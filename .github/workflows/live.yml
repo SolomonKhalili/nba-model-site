@@ -23,6 +23,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write       # to start itself again when new code is pushed
 
 jobs:
   model:
@@ -92,3 +93,10 @@ jobs:
           SITE_REMOTE: https://github.com/${{ github.repository }}.git
           STATE_REMOTE: git@github.com:SolomonKhalili/nba-sports-model.git
         run: cd app && python -u cloud.py --${{ steps.kind.outputs.kind }} --out ../site_out 2>> run.log
+
+      - name: Start again with the new code
+        # cloud.py stops when the private repo has newer code (and leaves app/.restart): start a fresh run now
+        if: always() && hashFiles('app/.restart') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run live.yml -R ${{ github.repository }} -f kind=live && echo "started a fresh run with the new code"

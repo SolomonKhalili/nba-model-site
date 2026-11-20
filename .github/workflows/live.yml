@@ -90,7 +90,6 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          SIGNUP_PRIVATE_KEY: ${{ secrets.SIGNUP_PRIVATE_KEY }}
           STATE_REMOTE: git@github.com:SolomonKhalili/nba-sports-model.git
         run: cd app && python -u cloud.py --${{ steps.kind.outputs.kind }} --out ../site_out 2>> run.log
 

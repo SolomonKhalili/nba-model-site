@@ -5,7 +5,7 @@
 # encrypted and only the accounts' passwords unlock it.
 #   • 6 AM – 1 AM New York time: a run stays on for up to ~5.5 h (FanDuel every 3 min, full update every 15 min,
 #     website republished on any change). The timer starts a new one every 30 min; a new run waits for the current one.
-#   • 1 AM – 6 AM: one quick update an hour (opening lines, overnight injury news).
+#   • Around the clock (20 Nov): overnight too, FanDuel every 3 min so new games' opening lines aren't missed.
 name: live
 
 on:
@@ -43,10 +43,6 @@ jobs:
           kind=live
           [ "${{ github.event_name }}" = "workflow_dispatch" ] && kind="${{ inputs.kind }}"
           h=$(date +%-H); m=$(date +%-M)
-          if [ "$kind" = "live" ] && [ "$h" -ge 1 ] && [ "$h" -lt 6 ]; then
-            # overnight: one update an hour (on the :00 timer only)
-            if [ "${{ github.event_name }}" = "schedule" ] && [ "$m" -ge 30 ]; then kind=skip; else kind=once; fi
-          fi
           echo "kind=$kind" >> "$GITHUB_OUTPUT"; echo "Run kind: $kind"
 
       - name: Get the private code and saved data

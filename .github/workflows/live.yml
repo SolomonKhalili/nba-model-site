@@ -32,6 +32,10 @@ jobs:
       TZ: America/New_York
       SITE_DATA_KEY: ${{ secrets.SITE_DATA_KEY }}
     steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
       - name: Which kind of run
         id: kind
         run: |
@@ -57,7 +61,7 @@ jobs:
           git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "https://github.com/"
           echo "ready"
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: steps.kind.outputs.kind != 'skip'
         with:
           python-version: "3.12"
@@ -71,6 +75,16 @@ jobs:
       - name: First time only - download every season
         if: steps.kind.outputs.kind != 'skip' && hashFiles('app/nba_model.db') == ''
         run: cd app && python data.py backfill > /dev/null && python backtest.py --save > /dev/null && echo "backfill done"
+
+      - name: Keep the timer alive
+        # GitHub pauses scheduled jobs in a repo with no new commits for 60 days: touch it once a month.
+        if: steps.kind.outputs.kind != 'skip'
+        run: |
+          last=$(git -C . log -1 --format=%ct 2>/dev/null || echo 0)
+          if [ $(( $(date +%s) - last )) -gt 2592000 ]; then
+            date -u > .keepalive && git add .keepalive && \
+            git -c user.name=nba-model-bot -c user.email=bot@users.noreply.github.com commit -q -m "keep alive" && git push -q && echo "kept alive"
+          fi
 
       - name: Update the model and the website
         if: steps.kind.outputs.kind != 'skip'

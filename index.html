@@ -1,0 +1,1868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.STATIC_SITE = true; window.RELAY_URL = "https://nba-model-relay.solomonkhalili.workers.dev"; window.PAGE_VERSION = "b25f67fd5ff0";</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0c11">
+<title>NBA Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Same look as the first-basket site: always dark, orange accent, sporty condensed headlines. */
+:root {
+  --display: "Barlow Condensed", "Arial Narrow", -apple-system, sans-serif;
+  color-scheme: dark;
+  --bg: #0a0c11; --surface: #12151c; --surface-2: #1a1e27; --text: #eef0f4; --muted: #949cab;
+  --line: #242a35; --accent: #ff7a1a; --accent-soft: #2b1a0c; --good: #4ade80; --good-soft: #10261a;
+  --warn: #fbbf24; --warn-soft: #2a2412; --bad: #f87171; --bad-soft: #2b1617; --live: #f87171;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  --shadow-up: 0 2px 6px rgba(0,0,0,.35), 0 14px 32px rgba(0,0,0,.4);
+  --glow: radial-gradient(900px 460px at 0% -10%, rgba(255,122,26,.16), transparent 60%),
+          radial-gradient(800px 420px at 100% -10%, rgba(59,130,246,.12), transparent 60%);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* hidden things stay hidden, whatever their style */
+html, body { overflow-x: hidden; }
+body { margin: 0; background: var(--glow), var(--bg); background-attachment: fixed; color: var(--text);
+  font: 15px/1.45 Inter, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; }
+.num { font-variant-numeric: tabular-nums; text-align: right; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 24px 20px 64px; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes pulse { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes bounce { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-9px) rotate(180deg); } }
+@keyframes grow { from { width: 0; } }
+#main.noanim .enter, #main.noanim .winbar i, #main.noanim .bars .fill { animation: none; }
+.enter { animation: fadeUp .5s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 60ms); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ── Banner ── */
+.banner { position: relative; overflow: hidden; border-radius: 22px; padding: 22px 24px 18px; color: #fff;
+  background: radial-gradient(620px 300px at 0% 0%, rgba(255,122,26,.38), transparent 62%),
+              radial-gradient(520px 280px at 100% 0%, rgba(59,130,246,.28), transparent 62%),
+              linear-gradient(135deg, #161b28, #0b0e15 70%);
+  border: 1px solid rgba(255,255,255,.07); box-shadow: 0 18px 50px rgba(8,10,16,.35); }
+.banner::after { content: ""; position: absolute; right: -60px; top: -40px; width: 620px; height: 330px; pointer-events: none;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 320' fill='none' stroke='white' stroke-width='3'><rect x='10' y='10' width='580' height='300' rx='6'/><line x1='300' y1='10' x2='300' y2='310'/><circle cx='300' cy='160' r='52'/><circle cx='300' cy='160' r='16'/><rect x='10' y='100' width='120' height='120'/><circle cx='130' cy='160' r='42'/><path d='M10 38 H60 A150 150 0 0 1 60 282 H10'/><rect x='470' y='100' width='120' height='120'/><circle cx='470' cy='160' r='42'/><path d='M590 38 H540 A150 150 0 0 0 540 282 H590'/><circle cx='40' cy='160' r='8'/><circle cx='560' cy='160' r='8'/></svg>") no-repeat center / contain; opacity: .09; transform: rotate(-4deg); }
+.banner > * { position: relative; z-index: 1; }
+.top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+.ball { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 32px;
+  background: radial-gradient(circle at 35% 30%, #ffb26b, #ea580c 70%);
+  box-shadow: 0 6px 22px rgba(234,88,12,.45), inset 0 -4px 10px rgba(0,0,0,.2); }
+.ball span { display: inline-block; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+.brand:hover .ball span { transform: rotate(360deg); }
+h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 40px; line-height: .95;
+  text-transform: uppercase; letter-spacing: .01em; }
+h1 span { color: #ff8a2b; }
+.date { color: rgba(255,255,255,.65); font-size: 14px; margin-top: 4px; }
+button { font: inherit; cursor: pointer; border: 0; color: inherit; }
+.btn { background: linear-gradient(135deg, #ff8a2b, #ea580c); color: #fff; font-weight: 650; padding: 10px 18px;
+  border-radius: 11px; box-shadow: 0 6px 20px rgba(234,88,12,.4); transition: transform .12s ease, box-shadow .2s, opacity .2s;
+  display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .55; cursor: wait; transform: none; }
+.btn.secondary { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.16); box-shadow: none; }
+.btn.secondary:hover { background: rgba(255,255,255,.14); }
+.btn.secondary.on { background: rgba(255,122,26,.22); border-color: #ff8a2b; }
+.daybtn { background: var(--surface); border-color: var(--line); color: var(--text); }
+.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.acct { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,.75);
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 6px 12px; }
+.acct b { color: #fff; }
+.acct .role { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #ff8a2b; }
+.acct a { color: rgba(255,255,255,.7); text-decoration: underline; cursor: pointer; }
+.inj-team { margin-bottom: 14px; }
+.inj-team h3 { margin: 0 0 8px; font-family: var(--display); font-size: 22px; letter-spacing: .02em; display: flex; gap: 10px; align-items: center; }
+.st { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+.st.out { background: var(--bad-soft); color: var(--bad); }
+.st.q { background: var(--warn-soft); color: var(--warn); }
+.st.p { background: var(--good-soft); color: var(--good); }
+.ticker { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.pill { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 4px 12px;
+  font-size: 13px; color: rgba(255,255,255,.72); display: inline-flex; align-items: center; gap: 7px; }
+.pill b { color: #fff; font-weight: 650; }
+.subtabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+.subtab { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 8px; font-weight: 650;
+  font-size: 14px; color: var(--text); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.subtab .count { font-size: 12px; color: var(--muted); background: var(--surface-2); border-radius: 999px; padding: 1px 7px; }
+.subtab.on { border-color: #ff8a2b; background: rgba(255,122,26,.16); }
+.results-list { list-style: none; margin: 0; padding: 4px 14px; }
+.results-list li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.results-list li:last-child { border-bottom: 0; }
+.results-list .mark { font-size: 18px; font-weight: 800; width: 22px; text-align: center; flex: none; }
+.results-list .ok { color: var(--good); } .results-list .no { color: var(--bad); } .results-list .eq { color: var(--muted); }
+.results-list small { color: var(--muted); display: block; margin-top: 3px; line-height: 1.5; }
+.verdict-line { margin: 10px 0 4px; padding: 10px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
+.verdict-line.good { border-color: var(--good); } .verdict-line.bad { border-color: var(--bad); }
+.gloss { margin-bottom: 10px; } .gloss p { margin: 8px 0; line-height: 1.5; } .gloss.start summary { font-weight: 800; }
+.pguide { margin: 8px 0 12px; } .pguide-title { margin-bottom: 8px; line-height: 1.45; }
+.pguide-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.pguide-card { border: 1px solid var(--line, #333); border-radius: 10px; padding: 8px 10px; font-size: 13px; line-height: 1.5; }
+.pguide-h { font-weight: 800; margin-bottom: 2px; }
+.data th.c, .data td.c { text-align: center; } .pkey { font-size: 12.5px; line-height: 1.5; margin: 4px 0 10px; }
+.edgekey { font-size: 13px; line-height: 1.5; margin: 6px 0 10px; padding: 10px 12px; border: 1px solid var(--line, rgba(148,163,184,.25)); border-radius: 10px; }
+.edgekey-rows { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 4px; }
+@media (max-width: 620px) { .data.rowcards td.c { text-align: left; } }
+@media (min-width: 621px) {
+  .data th, .data td { border: 1px solid var(--line); }
+  .data th.num, .data td.num { text-align: center; }
+}
+.bk th, .bk td { border: 1px solid var(--line); text-align: center; }
+.bk th:first-child, .bk td:first-child { text-align: left; }
+.tag.lbl-value-bet, .tag.lbl-safe-pick { color: #4ade80; border-color: rgba(74,222,128,.45); background: rgba(74,222,128,.10); }
+.tag.lbl-good-price { color: #60a5fa; border-color: rgba(96,165,250,.45); background: rgba(96,165,250,.10); }
+.tag.lbl-bigger-payout { color: #f59e0b; border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.10); }
+.tag.lbl-our-pick { color: var(--muted); }
+.gcell { display: inline-flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.slipbtns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.slipbtn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; border: 1px solid var(--line, #333); color: inherit; }
+.slipbtn.fd { background: #1493ff; color: #fff; border-color: #1493ff; } .slipbtn.dk { background: #0b0b0b; color: #53d337; border-color: #53d337; }
+.slipbtn.off { opacity: .55; font-weight: 600; }
+button.slipbtn { cursor: pointer; font-family: inherit; } .slipbtn.added { background: var(--good-soft, rgba(74,222,128,.15)); color: var(--good); border-color: var(--good); }
+.data td .neg { color: var(--bad); font-weight: 700; } .data td.edge .pos { color: var(--good); font-weight: 700; }
+.results-list .rgame { list-style: none; display: block; padding: 12px 14px; margin: 0 0 10px; border-radius: 12px;
+  background: var(--card, rgba(255,255,255,.03)); border: 1px solid var(--line, rgba(255,255,255,.08)); border-left: 4px solid var(--good); }
+.results-list .rgame.rg-no { border-left-color: var(--bad); }
+.rg-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 12px; }
+.rg-score { display: inline-flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; }
+.rg-score .w { font-weight: 850; } .rg-score .dash { opacity: .5; }
+.rg-meta { font-size: 12px; color: var(--muted); }
+.rtag { padding: 2px 7px; border-radius: 999px; background: rgba(148,163,184,.18); font-weight: 650; }
+.rtag.live { background: rgba(239,68,68,.18); color: #f87171; }
+.rg-pred { margin-top: 6px; font-size: 14px; color: var(--muted); } .rg-pred b { color: var(--text, inherit); }
+.rg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.rchip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.rchip.ok { background: rgba(34,197,94,.16); color: #4ade80; } .rchip.no { background: rgba(239,68,68,.16); color: #f87171; }
+.rchip.push { background: rgba(148,163,184,.18); color: var(--muted); }
+.rchip.why { flex-wrap: wrap; border-radius: 12px; } .rchip .why { flex-basis: 100%; font-weight: 400; font-size: 12px; }
+.pbar-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 14px; }
+.pbtn { background: var(--surface); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 8px 14px;
+  font: inherit; font-weight: 650; cursor: pointer; }
+.pbtn.on { border-color: #ff8a2b; background: rgba(255,122,26,.16); }
+.pbtn.book-on { border-color: var(--good); background: var(--good-soft); }
+.padd { background: var(--surface-2); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 6px 10px;
+  font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; white-space: nowrap; }
+.padd.in { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+.padd[disabled] { opacity: .45; cursor: default; }
+.padd[title] { opacity: .8; color: var(--bad); border-color: rgba(248,113,113,.35); white-space: normal; max-width: 170px; }
+.parlay-bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 40; max-width: 760px; margin: 0 auto;
+  background: var(--surface); border: 1px solid #ff8a2b; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.5); padding: 12px 14px; }
+.parlay-bar .legs { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+.parlay-bar .leg { background: var(--surface-2); border-radius: 999px; padding: 4px 10px; font-size: 13px; }
+.parlay-bar .leg b { cursor: pointer; color: var(--muted); margin-left: 6px; }
+.parlay-bar .sum { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 14px; }
+.parlay-bar .go { margin-left: auto; text-decoration: none; }
+.parlay-bar .note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.parlay-space { height: 260px; }
+.subtab.on .count { color: #fff; background: rgba(255,122,26,.4); }
+@media (max-width: 520px) { .subtab { font-size: 12.5px; padding: 9px 4px; flex-direction: column; gap: 2px; } }
+a.pill.link { cursor: pointer; text-decoration: none; border-color: rgba(74,222,128,.45); }
+a.pill.link:hover { background: rgba(74,222,128,.12); }
+.panel.highlight { border: 2px solid var(--good); background: linear-gradient(180deg, rgba(74,222,128,.10), rgba(74,222,128,.03)), var(--surface);
+  box-shadow: 0 0 0 4px var(--good-soft), 0 8px 30px rgba(74,222,128,.12); }
+.panel.highlight .data th { background: rgba(74,222,128,.14); color: var(--good); }
+.panel.highlight .data td { border-bottom-color: rgba(74,222,128,.18); }
+.panel.highlight .data td b { color: #fff; }
+.section-title.value-title { color: var(--good); }
+.section-title.value-title::before { background: var(--good); }
+.livedot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--good); display: inline-block; flex: none; }
+.livedot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--good); animation: pulse 1.6s ease-out infinite; }
+@media (max-width: 620px) {
+  .wrap { padding: 10px 10px 48px; }
+  .banner { padding: 14px 12px 12px; border-radius: 18px; }
+  h1 { font-size: 28px; } .ball { width: 42px; height: 42px; font-size: 23px; } .date { font-size: 12.5px; }
+  .top { gap: 10px; }
+  /* tabs and status pills: one row each that you swipe sideways, instead of filling the screen */
+  /* every tab visible at once: a grid of 3 per row (no sideways scrolling) */
+  .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+  .actions [data-tab="alerts"] { grid-column: span 3; }
+  .actions .btn { padding: 9px 4px; font-size: 13px; justify-content: center; gap: 4px; white-space: nowrap; border-radius: 10px; }
+  .actions #refresh, .actions .acct { grid-column: span 3; justify-content: center; }
+  .acct { padding: 5px 10px; font-size: 12px; white-space: nowrap; }
+  /* the small status pills can still slide sideways */
+  .ticker { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: -12px; margin-right: -12px;
+    padding: 0 12px; -webkit-overflow-scrolling: touch; width: calc(100% + 24px); }
+  .ticker::-webkit-scrollbar { display: none; }
+  .pill { flex: none; white-space: nowrap; font-size: 12px; padding: 3px 10px; }
+  .ticker { margin-top: 10px; }
+  .intro { font-size: 13px; }
+  .card-head { padding: 14px 12px 10px; } .card-body { padding: 12px 12px 14px; }
+  .mu .tm { font-size: 22px; gap: 7px; } .mu .tm .logo { width: 28px; height: 28px; }
+  .mu .tm small { font-size: 11px; } .mu .score { font-size: 30px; }
+  .bk { font-size: 13px; } .bk th { font-size: 10.5px; padding: 6px 3px; } .bk td { padding: 8px 3px; }
+}
+
+/* ── Sections ── */
+.section-title { font-family: var(--display); font-size: 17px; text-transform: uppercase; letter-spacing: .06em;
+  margin: 26px 0 12px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.section-title::before { content: ""; width: 4px; height: 16px; border-radius: 2px; background: var(--accent); }
+.intro { color: var(--muted); margin: 18px 0 0; max-width: 780px; font-size: 14px; }
+.intro b { color: var(--text); }
+.warn { background: var(--warn-soft); color: var(--warn); border-radius: 13px; padding: 12px 16px; margin-top: 14px; font-size: 14px; }
+.progress { display: none; align-items: center; gap: 12px; margin: 18px 0 0; padding: 12px 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 13px; box-shadow: var(--shadow); }
+.progress.on { display: flex; animation: fadeUp .3s ease both; }
+.bouncer { font-size: 20px; display: inline-block; animation: bounce .9s cubic-bezier(.5,0,.5,1) infinite; }
+.empty { color: var(--muted); padding: 40px 0; text-align: center; }
+
+/* ── Game cards ── */
+.cards.one-col { grid-template-columns: minmax(0, 900px); justify-content: center; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(560px, 100%), 1fr)); gap: 20px; }
+.card { background: linear-gradient(180deg, rgba(255,255,255,.025), transparent 30%), var(--surface);
+  border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; min-width: 0;
+  transition: transform .18s ease, box-shadow .25s ease; }
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-up); }
+.card-head { display: grid; gap: 8px; padding: 16px 18px 12px; border-bottom: 1px solid var(--line); position: relative;
+  background: linear-gradient(100deg, color-mix(in srgb, var(--away-c) 30%, transparent), transparent 42%,
+              transparent 58%, color-mix(in srgb, var(--home-c) 30%, transparent)); }
+.card-head::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px;
+  background: linear-gradient(90deg, var(--away-c) 0 50%, var(--home-c) 50% 100%); }
+.mu { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+.mu .tm { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 28px;
+  letter-spacing: .02em; line-height: 1; min-width: 0; }
+.mu .tm.home { justify-content: flex-end; text-align: right; }
+.mu .tm small { display: block; font-family: Inter, sans-serif; font-size: 12px; font-weight: 600; color: var(--muted);
+  letter-spacing: 0; margin-top: 3px; text-transform: none; }
+.mu .score { font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 1; white-space: nowrap; }
+.mu .score .dash { color: var(--muted); font-weight: 600; padding: 0 6px; }
+.head-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.head-meta .status { margin-left: auto; white-space: nowrap; }
+.logo { object-fit: contain; flex: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+.badge { font-size: 12px; font-weight: 650; border-radius: 999px; padding: 3px 10px; white-space: nowrap;
+  background: var(--accent-soft); color: var(--accent); }
+.badge.good { background: var(--good-soft); color: var(--good); }
+.badge.neutral { background: rgba(59,130,246,.16); color: #93b4ff; }
+.badge.event { background: rgba(250,204,21,.14); color: #fde047; }
+.badge.event.big { background: rgba(250,204,21,.22); color: #fef08a; box-shadow: 0 0 0 1px rgba(250,204,21,.45) inset; }
+.card-body { padding: 16px 18px 18px; }
+.winrow { display: grid; grid-template-columns: 44px 1fr 44px; gap: 10px; align-items: center; font-weight: 700;
+  font-variant-numeric: tabular-nums; }
+.winrow span:last-child { text-align: right; }
+.winbar { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; display: flex; gap: 2px; }
+.winbar i { display: block; height: 100%; animation: grow .8s cubic-bezier(.2,.7,.2,1) both; }
+.wintext { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+.wintext b { color: var(--text); }
+.bk { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; table-layout: fixed; }
+.bk th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650;
+  text-align: right; padding: 6px 6px; border-bottom: 1px solid var(--line); }
+.bk th:first-child, .bk td:first-child { text-align: left; }
+.bk td { padding: 9px 6px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere; }
+.bk tr:last-child td { border-bottom: 0; }
+.bk td.model { font-weight: 700; color: #ff8a2b; }
+.bk .moved { display: block; font-size: 11px; color: var(--muted); }
+.value { margin-top: 14px; padding: 10px 12px; border-radius: 11px; font-size: 14px; font-weight: 600;
+  background: var(--good-soft); color: var(--good); border: 1.5px solid var(--good); border-left-width: 5px; }
+.value span { color: var(--text); font-weight: 500; }
+.value .why { display: block; margin-top: 4px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.mvs { margin-top: 12px; display: grid; gap: 6px; }
+.mv { font-size: 13.5px; padding: 8px 10px; border-radius: 10px; border-left: 4px solid; background: var(--surface-2); color: var(--muted); }
+.mv b { color: var(--text); }
+.mv.toward { border-color: var(--good); }
+.mv.against { border-color: var(--bad); }
+.mv.waiting { border-color: var(--warn); }
+.noedge { margin-top: 14px; padding: 10px 12px; border-radius: 11px; font-size: 14px; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--line); }
+.chips { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 10px; background: var(--warn-soft); color: var(--warn);
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
+.chip.more { cursor: pointer; background: var(--surface-2); color: var(--muted); border-color: var(--line); }
+.inj-note { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.live-score .trail { color: var(--muted); }
+.status.is-live { color: var(--live); font-weight: 650; display: inline-flex; align-items: center; gap: 6px; }
+.livedot.red { background: var(--live); }
+.livedot.red::after { background: var(--live); }
+.mu .tm small.rec { color: var(--text); font-weight: 650; }
+.lineup { font-size: 13.5px; color: var(--muted); margin: -4px 0 14px; line-height: 1.5; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.lineup b { color: var(--text); }
+.lineup.ok { border-color: rgba(74,222,128,.45); background: rgba(74,222,128,.07); }
+.lineup.warn { border-color: rgba(250,204,21,.4); background: rgba(250,204,21,.06); }
+.lineup .dim { display: block; font-size: 12.5px; }
+.lineup .raised { margin-top: 4px; font-size: 12.5px; }
+.lineup details { margin-top: 4px; font-size: 12.5px; }
+.lineup details div { margin-top: 2px; }
+.inj-list { border-top: 1px solid var(--line); }
+.inj-row { padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.inj-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.inj-sub { color: var(--muted); font-size: 13px; margin-top: 3px; }
+.ch-box { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.ch-box code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+  font-size: 14px; color: var(--text); word-break: break-all; }
+.ch-box .btn { padding: 7px 12px; font-size: 13px; }
+.al-row { display: flex; flex-direction: column; gap: 2px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.al-row:last-child { border-bottom: 0; }
+.al-row span { color: var(--muted); font-size: 13.5px; }
+.stale { margin: 12px 0; padding: 12px 14px; border-radius: 12px; font-size: 14px; line-height: 1.45;
+  background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.55); color: var(--text); }
+.wincmp { margin: 4px 0 10px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.wc-h { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; padding: 8px 12px 4px; }
+.wc-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 12px; border-top: 1px solid var(--line); font-size: 14px; }
+.wc-row.model { background: rgba(255,122,26,.08); }
+.wc-src { color: var(--muted); white-space: nowrap; }
+.wc-pct { text-align: right; }
+.wc-pct small { display: block; color: var(--muted); font-size: 12px; }
+.wintext .why { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
+.fade { margin-top: 12px; padding: 9px 12px; border-radius: 11px; font-size: 13px; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--line); }
+.oc { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; font-weight: 650; }
+.oc b { color: var(--text); }
+.chips .chip.extra { display: none; }
+.chips.all .chip.extra { display: inline; }
+button.chip.more { font: inherit; cursor: pointer; }
+.h2h { font-size: 13.5px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+.h2h .dim { color: var(--muted); font-size: 12.5px; }
+.h2h b { color: var(--text); }
+.predscore { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-bottom: 12px; font-size: 15px; }
+.predscore .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; }
+.predscore b { font-family: var(--display); font-size: 22px; letter-spacing: .02em; }
+.predscore .rng { color: var(--muted); font-size: 12.5px; width: 100%; }
+.alts { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; background: var(--surface-2); }
+.alts-h { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; margin-bottom: 4px; }
+.alts-h small { text-transform: none; letter-spacing: 0; font-weight: 500; margin-left: 6px; }
+.alts.safe { border-color: color-mix(in srgb, var(--good) 45%, var(--line)); }
+.alt-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; font-size: 13.5px; padding: 4px 0; align-items: center; }
+.alt-row span:nth-child(3) { color: var(--muted); font-size: 12.5px; }
+@media (max-width: 520px) { .alt-row { grid-template-columns: 1fr auto; row-gap: 0; padding: 5px 0; }
+  .alt-row span:nth-child(3) { grid-column: 1 / -1; margin-top: -2px; } }
+.inj-note b { color: var(--text); }
+
+/* ── Tables ── */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow-x: auto; }
+.data { width: 100%; border-collapse: collapse; min-width: 640px; font-size: 14px; }
+.data th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+  font-weight: 650; padding: 12px 14px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.data td { padding: 11px 14px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.data tr:last-child td { border-bottom: 0; }
+.data tr:hover td { background: rgba(255,255,255,.02); }
+.tag { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 1px 6px; margin-left: 4px; white-space: nowrap;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+.pos { color: var(--good); font-weight: 700; }
+.neg { color: var(--bad); font-weight: 700; }
+.up { color: var(--good); font-weight: 700; }
+.down { color: var(--bad); font-weight: 700; }
+details { margin-top: 16px; color: var(--muted); font-size: 14px; }
+details.howto { margin-top: 14px; }
+summary { cursor: pointer; color: var(--text); font-weight: 650; }
+
+/* phones: no sideways scrolling — each row is a stacked card with labels on the left */
+@media (max-width: 620px) {
+  .panel:has(.rowcards), .panel.highlight:has(.rowcards) { overflow-x: visible; background: transparent; border: 0; box-shadow: none; }
+  .data { min-width: 0; } .data th, .data td { padding: 10px 8px; } .data.rowcards { display: block; font-size: 14px; }
+  .data.rowcards tbody { display: block; }
+  .data.rowcards tr.headrow { display: none; }
+  .data.rowcards tr { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    margin-bottom: 10px; padding: 6px 12px; }
+  .panel.highlight .data.rowcards tr { border: 2px solid var(--good); background: linear-gradient(180deg, rgba(74,222,128,.10), rgba(74,222,128,.03)), var(--surface); }
+  .data.rowcards tr { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); column-gap: 12px; }
+  .data.rowcards td { display: block; text-align: left; padding: 6px 0; border-bottom: 0; }
+  .data.rowcards td::before { content: attr(data-label); display: block; color: var(--muted); font-size: 11px; font-weight: 650;
+    text-transform: uppercase; letter-spacing: .04em; margin-bottom: 1px; }
+  .data.rowcards td[data-label=""]::before { display: none; }
+  .data.rowcards td[data-book]::before { padding-left: 19px; background: no-repeat left center / 14px 14px; }
+  .data.rowcards td[data-book="DraftKings"]::before { background-image: url("https://www.google.com/s2/favicons?domain=sportsbook.draftkings.com&sz=64"); }
+  .data.rowcards td[data-book="FanDuel"]::before { background-image: url("https://www.google.com/s2/favicons?domain=sportsbook.fanduel.com&sz=64"); }
+  /* bet cards: bet + price on one full row, the two chances side by side, the edge on its own row */
+  .data.bets.rowcards td:nth-child(2), .data.bets.rowcards td:last-child { grid-column: 1 / -1; }
+  .data.bets.rowcards td:nth-child(3), .data.bets.rowcards td:nth-child(4) { display: flex; flex-direction: column; justify-content: space-between;
+    font-size: 17px; font-weight: 700; }
+  .data.bets.rowcards td.edge { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px dashed var(--line);
+    margin-top: 4px; padding-top: 8px; font-size: 16px; }
+  .data.bets.rowcards td.edge::before { margin: 0; }
+  .data.rowcards td:first-child { grid-column: 1 / -1; font-weight: 700; font-size: 15px; border-bottom: 1px dashed var(--line); padding-bottom: 8px; margin-bottom: 2px; }
+  .data.rowcards td:first-child::before { display: none; }
+  .data.rowcards tr:hover td { background: none; }
+}
+
+.data .price { color: var(--text); font-weight: 600; white-space: nowrap; margin-left: 4px; }
+.betline { display: flex; align-items: center; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; }
+.betline .price { margin-left: auto; }          /* price + sportsbook on the right, the bet on the left */
+.data.bets td:first-child, .data.bets td.edge { white-space: nowrap; }
+.book { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; vertical-align: middle; }
+.booklogo { border-radius: 4px; flex: none; display: inline-block; }
+.bk th .book { flex-direction: column; gap: 4px; }
+.bk.lines td { white-space: nowrap; }
+.bk.lines td:first-child .moved { white-space: normal; }
+@media (max-width: 620px) {   /* fit "Opened at …" on phones (owner: one line each) */
+  .bk.lines th { text-transform: none; letter-spacing: 0; font-size: 10.5px; padding-left: 2px; padding-right: 2px; }
+  .bk.lines td { font-size: 12.5px; padding-left: 3px; padding-right: 3px; }
+  .bk.lines .moved { font-size: 10px; }
+  .bk.lines th:nth-child(1) { width: 21%; } .bk.lines th:nth-child(2) { width: 24%; } .bk.lines th:nth-child(3), .bk.lines th:nth-child(4) { width: 27.5%; } }
+@media (max-width: 360px) { .bk.lines td { font-size: 11px; padding-left: 1px; padding-right: 1px; } .bk.lines .moved { font-size: 9px; letter-spacing: -.02em; } .bk.lines td:first-child { font-size: 10px; } }
+.booklogo.txt { font-size: 9px; font-weight: 800; display: inline-grid; place-items: center; letter-spacing: -.02em; }
+/* ── Stat boxes ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; box-shadow: var(--shadow); }
+.stat .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 650; }
+.stat .big { font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 1.05; margin-top: 4px; }
+.stat .note { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.stat .note b { color: var(--text); }
+.bars { padding: 6px 18px; }
+.bars .row { display: grid; grid-template-columns: 220px 1fr 64px; gap: 12px; align-items: center; padding: 9px 0; font-size: 14px; }
+.bars .track { height: 12px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.bars .fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ff8a2b, #ea580c); animation: grow .8s cubic-bezier(.2,.7,.2,1) both; }
+.bars .fill.book { background: #3b4558; }
+@media (max-width: 560px) { .bars .row { grid-template-columns: 1fr 64px; } .bars .row .track { grid-column: 1 / -1; grid-row: 2; } }
+
+/* ── Line moves ── */
+.log { margin-top: 12px; font-size: 13px; max-height: 190px; overflow-y: auto; border-top: 1px solid var(--line); }
+.log div { padding: 6px 0; border-bottom: 1px dashed var(--line); display: flex; gap: 10px; }
+.log time { color: var(--muted); min-width: 70px; font-variant-numeric: tabular-nums; }
+.mvc { white-space: nowrap; } .mvc .was { color: var(--muted); }
+.tlab { font-size: 11px; color: var(--muted); font-weight: 650; }
+.log time { white-space: nowrap; }
+.log div > span { white-space: nowrap; }
+.log .lv { white-space: nowrap; }
+@media (max-width: 360px) { .card-body .log div { font-size: 11px; gap: 5px; } .card-body .log time { min-width: 48px; } }
+.mvbooks { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.mvbook { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.mvbook-h { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: rgba(148,163,184,.07);
+  border-bottom: 1px solid var(--line); font-weight: 700; }
+.mvbook-h .moved { font-size: 12px; color: var(--muted); font-weight: 500; }
+.mvt { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14px; font-variant-numeric: tabular-nums; }
+.mvt th { font-size: 12px; color: var(--muted); font-weight: 650; padding: 8px 6px 4px; text-align: center; white-space: nowrap; }
+.mvt th:nth-child(1) { width: 26%; } .mvt th:nth-child(2) { width: 20%; }
+.mvt td { padding: 5px 6px; text-align: center; white-space: nowrap; }
+.mvt td.mk { text-align: left; font-weight: 700; padding-left: 12px; vertical-align: middle; }
+.mvt td.rl { text-align: left; color: var(--muted); font-size: 12px; }
+.mvt td.o { color: var(--muted); }
+.mvt tr.g1 td { border-top: 1px solid var(--line); padding-top: 8px; }
+.mvt tr.g2 td { padding-bottom: 8px; }
+@media (max-width: 620px) {
+  .mvt { font-size: 13px; } .mvt th:nth-child(1) { width: 27%; } .mvt th:nth-child(2) { width: 21%; }
+  .mvt td { padding-left: 3px; padding-right: 3px; } .mvt td.mk { padding-left: 10px; }
+  .log div { gap: 8px; font-size: 12.5px; } .log time { min-width: 58px; }
+}
+
+/* ── Login (website only) ── */
+.login { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px;
+  background: var(--glow), var(--bg); }
+.login form { width: min(380px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+  padding: 26px 24px; box-shadow: var(--shadow-up); display: grid; gap: 12px; }
+.login h2 { margin: 0 0 4px; font-family: var(--display); font-size: 30px; text-transform: uppercase; }
+.login h2 span { color: #ff8a2b; }
+.login input { font: inherit; font-size: 16px; /* 16px+ stops iPhone Safari zooming in on tap */ color: var(--text); background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 11px; padding: 11px 13px; }
+.login input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.login label { font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+.login .err { color: var(--bad); font-size: 13px; min-height: 18px; }
+.login .btn { justify-content: center; }
+#pwBox:not([hidden]) { display: grid; gap: 10px; }
+</style>
+</head>
+<body>
+<div class="login" id="login" hidden>
+  <form id="loginForm" autocomplete="on">
+    <h2>NBA <span>Model</span></h2>
+    <div style="color:var(--muted);font-size:14px;margin-bottom:6px">Members of the private NBA Model Discord server can see the predictions.</div>
+    <a class="btn" id="discordBtn" style="justify-content:center;text-decoration:none;background:#5865F2">Sign in with Discord</a>
+    <div class="err" id="loginErr"></div>
+    <div id="pwBox" hidden>
+      <input id="user" name="username" placeholder="Username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <input id="pass" name="password" type="password" placeholder="Password" autocomplete="current-password">
+      <label><input type="checkbox" id="remember" checked> Keep me signed in for 30 days</label>
+      <button class="btn secondary" type="submit">Sign in with password</button>
+    </div>
+    <a id="pwToggle" style="color:var(--muted);font-size:12px;cursor:pointer;text-align:center">Owner login</a>
+  </form>
+</div>
+<div class="wrap">
+  <header class="banner">
+    <div class="top">
+      <div class="brand">
+        <div class="ball"><span>🏀</span></div>
+        <div>
+          <h1>NBA <span>Model</span></h1>
+          <div class="date" id="stamp">Loading…</div>
+        </div>
+      </div>
+      <div class="actions" id="tabs">
+        <button class="btn secondary on" data-tab="games" title="Tonight's predicted scores, spreads, totals and win chances">🏀 Picks</button>
+        <button class="btn secondary" data-tab="bets" title="Bets where our model disagrees most with DraftKings and FanDuel">💰 Best bets</button>
+        <button class="btn secondary" data-tab="parlay" title="Pick bets and open them all in one DraftKings or FanDuel betslip">🎟️ Parlay builder</button>
+        <button class="btn secondary" data-tab="injuries" title="Every injury for tonight's games">🩹 Injuries</button>
+        <button class="btn secondary" data-tab="moves" title="Every DraftKings and FanDuel line change today, with the time">📈 Odds tracker</button>
+        <button class="btn secondary" data-tab="accuracy" title="How our picks have done: accuracy and line moves">📊 Results</button>
+        <button class="btn secondary" data-tab="alerts" title="Get a phone notification when there's a value bet">📲 Phone alerts</button>
+        <button class="btn" id="refresh" title="Run the model again now">🔄 Update picks</button>
+        <span class="acct" id="acct" hidden></span>
+      </div>
+    </div>
+    <div class="ticker" id="ticker"></div>
+  </header>
+  <div class="progress" id="progress"><span class="bouncer">🏀</span><span>Updating scores, injuries and odds…</span></div>
+  <div id="stale" class="stale" hidden></div>
+<main id="main"></main>
+</div>
+
+<script>
+const TEAM_COLOR = {
+  ATL:"#E03A3E", BOS:"#009A44", BKN:"#9CA3AF", CHA:"#00A3AD", CHI:"#CE1141", CLE:"#A0144F", DAL:"#0B6CC1",
+  DEN:"#FEC524", DET:"#1D42BA", GS:"#FFC72C", HOU:"#D31145", IND:"#FDBB30", LAC:"#3B6FD8", LAL:"#8E5ED8",
+  MEM:"#5D76A9", MIA:"#E0245E", MIL:"#00A651", MIN:"#78BE20", NO:"#B4975A", NY:"#F58426", OKC:"#007AC1",
+  ORL:"#0077C0", PHI:"#006BB6", PHX:"#E56020", POR:"#E03A3E", SAC:"#8A5CC8", SA:"#A2AAAD", TOR:"#CE1141",
+  UTAH:"#F9A01B", WSH:"#E31837",
+};
+const TEAMS = {ATL:"Hawks",BOS:"Celtics",BKN:"Nets",CHA:"Hornets",CHI:"Bulls",CLE:"Cavaliers",DAL:"Mavericks",
+  DEN:"Nuggets",DET:"Pistons",GS:"Warriors",HOU:"Rockets",IND:"Pacers",LAC:"Clippers",LAL:"Lakers",MEM:"Grizzlies",
+  MIA:"Heat",MIL:"Bucks",MIN:"Timberwolves",NO:"Pelicans",NY:"Knicks",OKC:"Thunder",ORL:"Magic",PHI:"76ers",PHX:"Suns",
+  POR:"Trail Blazers",SAC:"Kings",SA:"Spurs",TOR:"Raptors",UTAH:"Jazz",WSH:"Wizards"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const color = t => TEAM_COLOR[t] || "#949cab";
+/* Sportsbook logos: each book's own site icon (via Google's public favicon service); if it can't load, a small letter badge */
+const BOOKS = {DraftKings: {site: "sportsbook.draftkings.com", short: "DK", bg: "#0b0b0b", fg: "#53d337"},
+               FanDuel: {site: "sportsbook.fanduel.com", short: "FD", bg: "#1493ff", fg: "#fff"}};
+const bookKey = n => /draft/i.test(n || "") ? "DraftKings" : /fan ?duel/i.test(n || "") ? "FanDuel" : null;
+function bookLogo(n, size = 16) {
+  const k = bookKey(n); if (!k) return "";
+  const b = BOOKS[k];
+  return `<img class="booklogo" src="https://www.google.com/s2/favicons?domain=${b.site}&sz=64" width="${size}" height="${size}" alt=""
+    onerror="this.outerHTML='<span class=&quot;booklogo txt&quot; style=&quot;background:${b.bg};color:${b.fg};width:${size}px;height:${size}px&quot;>${b.short}</span>'">`;
+}
+const book = (n, size) => `<span class="book">${bookLogo(n, size)}${esc(n)}</span>`;
+const logoUrl = t => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${String(t).toLowerCase()}.png&w=96&h=96`;
+const logo = (t, size = 34) => `<img class="logo" src="${logoUrl(t)}" width="${size}" height="${size}" alt="${esc(t)}"
+  loading="lazy" onerror="this.outerHTML='<span class=&quot;dot&quot; style=&quot;background:${color(t)}&quot;></span>'">`;
+// "CHA @ ATL" -> "ATL vs CHA": home team first, as on the game cards
+const vs = s => { const [a, h] = String(s || "").split(" @ "); return h ? `${h} vs ${a}` : String(s || ""); };
+// "2027-01-02" -> "Jan 2, 2027"
+const niceDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || "")); if (!m) return String(s || "");
+  return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"}); };
+const MINUS = "\u2212";   // a real minus sign: the plain hyphen looks spaced out in this font
+const odds = o => o == null ? "–" : (o > 0 ? "+" + Math.round(o) : MINUS + Math.abs(Math.round(o)));
+const pct = (x, d = 0) => x == null ? "–" : (100 * x).toFixed(d) + "%";
+const sp = x => x == null ? "–" : (x > 0 ? "+" : x < 0 ? MINUS : "") + Math.abs(Number(x)).toFixed(1);
+const f1 = x => x == null ? "–" : Number(x).toFixed(1);
+const pickName = s => String(s ?? "").replace(/(^|\s)-(\d)/g, `$1${MINUS}$2`);
+const fair = p => p >= .5 ? -Math.round(100 * p / (1 - p)) : Math.round(100 * (1 - p) / p);
+let state = {tab: "games", day: null, pred: null, track: null, back: null, moves: null};
+
+async function get(url) { const r = await fetch(url, {cache: "no-store"}); return r.json(); }
+
+/* ---------- Website mode: everything arrives encrypted; your password unlocks it ---------- */
+const STATIC = !!window.STATIC_SITE;
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64e = b => btoa(String.fromCharCode(...b));
+let dataKey = null;
+async function unwrapKey(entry, password) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+  const kek = await crypto.subtle.deriveKey({name: "PBKDF2", hash: "SHA-256", salt: b64d(entry.salt), iterations: entry.iter},
+                                            base, {name: "AES-GCM", length: 256}, false, ["decrypt"]);
+  return new Uint8Array(await crypto.subtle.decrypt({name: "AES-GCM", iv: b64d(entry.iv)}, kek, b64d(entry.wk)));
+}
+async function decryptData(raw, file = "data.json") {
+  const e = await get(file + "?t=" + Date.now());
+  const k = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name: "AES-GCM", iv: b64d(e.iv)}, k, b64d(e.ct))));
+}
+function savedKey() {
+  try { const s = JSON.parse(localStorage.getItem("nbaModelKey") || "null");
+        return s && s.until > Date.now() ? b64d(s.k) : null; } catch (_) { return null; }
+}
+function showLogin(msg) { $("#login").hidden = false; $("#loginErr").textContent = msg || "";
+  $("#loginErr").style.color = /^✅/.test(msg || "") ? "var(--good)" : ""; }
+
+async function fetchAll() {
+  if (!STATIC) return Promise.all([get("/api/predictions"), get("/api/tracker"), get("/api/backtest"), get("/api/moves")]);
+  const b = await decryptData(dataKey);
+  return [b.predictions, b.tracker, b.backtest, b.moves];
+}
+
+async function load() {
+  // Discord's DraftKings button for an alternate line opens <site>#dk=<pick>: remember it (it survives signing in),
+  // then once the data is in, look the line up in DraftKings' own feed and go straight to its betslip.
+  if (/^#dk=/.test(location.hash)) {
+    try { localStorage.setItem("dkJump", decodeURIComponent(location.hash.slice(4))); } catch (_) {}
+    history.replaceState(null, "", location.pathname);
+  }
+  if (STATIC && signinTicket()) return finishDiscordSignin();
+  if (STATIC && /^#signin-error=/.test(location.hash)) {
+    const why = location.hash.split("=")[1];
+    history.replaceState(null, "", location.pathname);
+    return showLogin(SIGNIN_ERRORS[why] || SIGNIN_ERRORS.failed);
+  }
+  if (STATIC && !dataKey) { dataKey = savedKey(); if (!dataKey) return showLogin(); recheckMember(); }
+  try {
+    [state.pred, state.track, state.back, state.moves] = await fetchAll();
+  } catch (e) {
+    if (STATIC) { dataKey = null; try { localStorage.removeItem("nbaModelKey"); } catch (_) {} return showLogin("Please sign in again."); }
+    throw e;
+  }
+  showAccount();
+  const p = state.pred || {};
+  $("#stamp").textContent = p.made_at ? "Updated " + p.made_at : "No predictions yet";
+  staleCheck();
+  const games = (p.games || []).length, bets = (p.bets || []).length, m = state.moves || {};
+  $("#ticker").innerHTML = [
+    `<span class="pill"><b>${games}</b> games</span>`,
+    ...hitPills(),
+    `<span class="pill"><b>${p.injuries_listed ?? "–"}</b> players on the injury report</span>`,
+    `<span class="pill"><span class="livedot"></span>Odds checked ${m.checked ? "at <b>" + esc(m.checked) + "</b>" : "every few minutes"}</span>`,
+  ].join("");
+  render();
+  jumpToDK();
+}
+
+async function jumpToDK() {
+  let key = null;
+  try { key = localStorage.getItem("dkJump"); localStorage.removeItem("dkJump"); } catch (_) {}
+  if (!key) return;
+  await loadDKSlips();
+  // one bet, or a whole parlay ("key1,key2,..."): every leg must be found, then one DraftKings betslip with all of them
+  const keys = key.split(","), found = keys.map(k => (state.dkSlip || {})[k]);
+  if (found.every(Boolean)) {
+    location.href = "https://sportsbook.draftkings.com/?outcomes=" + found.map(d => String(d.id).replace(/#/g, "%23")).join("+");
+    return;
+  }
+  const missing = keys.filter((k, i) => !found[i]).map(k => k.split("|")[0].replace("@", " @ ")).join(", ");
+  alert(`DraftKings isn't offering ${keys.length > 1 ? "every line of this parlay" : "that exact line"} right now (lines change during the day). Missing: ${missing}. Try the FanDuel button, or the Parlay builder tab.`);
+}
+
+function showAccount() {
+  const el = $("#acct");
+  if (!STATIC) { el.hidden = false; el.innerHTML = `🖥 <b>This Mac</b> <span class="role">owner</span>`; return; }
+  let u = ""; try { u = localStorage.getItem("nbaModelUser") || ""; } catch (_) {}
+  if (!dataKey) { el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = `👤 <b>${esc(u || "signed in")}</b> <span class="role">viewer</span> · <a id="logout">Log out</a>`;
+  $("#logout").onclick = () => {
+    signOut();
+  };
+}
+
+if (STATIC) {
+  $("#refresh").hidden = true;
+  $("#loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    if ($("#pwBox").hidden) return;
+    $("#loginErr").textContent = "Signing in…";
+    try {
+      const users = await get("users.json?t=" + Date.now());
+      const typed = $("#user").value.trim();   // phones capitalise the first letter: match any capitals
+      const entry = users[typed] || users[Object.keys(users).find(u => u.toLowerCase() === typed.toLowerCase())];
+      if (!entry) throw new Error("bad");
+      dataKey = await unwrapKey(entry, $("#pass").value);
+      if ($("#remember").checked) try {
+        localStorage.setItem("nbaModelKey", JSON.stringify({k: b64e(dataKey), until: Date.now() + 30 * 864e5}));
+      } catch (_) {}
+      $("#login").hidden = true; $("#pass").value = ""; $("#loginErr").textContent = "";
+      try { localStorage.setItem("nbaModelUser", $("#user").value.trim()); } catch (_) {}
+      showAccount();
+      load();
+    } catch (_) { dataKey = null; $("#loginErr").textContent = "Wrong username or password."; }
+  });
+}
+
+/* ---------- Sign in with Discord (relay checks you're in the NBA Model server, live) ---------- */
+const signinTicket = () => (/^#signin=([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/.exec(location.hash) || [])[1] || "";
+const SIGNIN_ERRORS = {
+  notmember: "That Discord account isn't a member of the NBA Model server. Ask the owner for an invite, then try again.",
+  cancelled: "Discord sign-in was cancelled. Tap \"Sign in with Discord\" to try again.",
+  expired: "That took too long. Tap \"Sign in with Discord\" to try again.",
+  failed: "Discord sign-in didn't work. Tap \"Sign in with Discord\" to try again.",
+  revoked: "You're no longer a member of the NBA Model Discord server, so you've been signed out."};
+function signOut(msg) {
+  try { ["nbaModelKey", "nbaModelUser", "nbaModelSession"].forEach(k => localStorage.removeItem(k)); } catch (_) {}
+  dataKey = null; $("#acct").hidden = true; showLogin(msg);
+}
+async function finishDiscordSignin() {
+  const ticket = signinTicket();
+  history.replaceState(null, "", location.pathname);
+  showLogin("Signing you in…");
+  const r = await fetch(window.RELAY_URL + "/key", {method: "POST", headers: {"Content-Type": "application/json"},
+                                                    body: JSON.stringify({ticket})});
+  const j = r.ok ? await r.json() : {};
+  if (!j.ok) return showLogin(SIGNIN_ERRORS.expired);
+  dataKey = b64d(j.key);
+  try {
+    localStorage.setItem("nbaModelKey", JSON.stringify({k: j.key, until: Date.now() + 30 * 864e5}));
+    localStorage.setItem("nbaModelUser", j.name || "");
+    localStorage.setItem("nbaModelSession", j.session);
+  } catch (_) {}
+  $("#login").hidden = true; $("#loginErr").textContent = "";
+  showAccount(); load();
+}
+async function recheckMember() {
+  // every time the page opens: still in the Discord server? If not, sign out (left or kicked)
+  let session = ""; try { session = localStorage.getItem("nbaModelSession") || ""; } catch (_) {}
+  if (!session || !window.RELAY_URL) return;          // password (owner) logins have no Discord session
+  try {
+    const r = await fetch(window.RELAY_URL + "/session", {method: "POST", headers: {"Content-Type": "application/json"},
+                                                          body: JSON.stringify({session})});
+    if (r.ok && !(await r.json()).ok) signOut(SIGNIN_ERRORS.revoked);
+  } catch (_) { /* offline: try again next time */ }
+}
+if (STATIC) {
+  $("#discordBtn").onclick = () => { if (window.RELAY_URL) location.href = window.RELAY_URL + "/oauth/start"; };
+  $("#pwToggle").onclick = () => { $("#pwBox").hidden = !$("#pwBox").hidden; };
+}
+
+function hitPills() {
+  const hr = (state.back && state.back.hit_rates) || [];
+  const w = hr.find(h => h.name === "Picked the winner");
+  const live = ((state.track && state.track.summary) || []).find(r => r.market === "winner" && r.won + r.lost > 0);
+  const out = [];
+  if (w) out.push(`<span class="pill">🎯 Picked the winner in <b>${pct(w.pct, 1)}</b> of past games</span>`);
+  if (live) out.push(`<span class="pill">🎯 Winner picks since we went live: <b>${live.won}-${live.lost}</b> (${pct(live.hit_pct)})</span>`);
+  return out;
+}
+
+function render() {
+  document.querySelectorAll("#tabs [data-tab]").forEach(b => b.classList.toggle("on", b.dataset.tab === state.tab));
+  // owner (21 Nov): live-score refreshes re-render the page; don't replay the grow/fade animations then (the win bar
+  // looked like it was changing). Animations only run when a tab is first opened.
+  $("#main").classList.toggle("noanim", render.lastTab === state.tab); render.lastTab = state.tab;
+  $("#main").innerHTML = ({games: gamesView, bets: betsView, injuries: injuriesView, moves: movesView, track: accuracyView, accuracy: accuracyView, alerts: alertsView, parlay: parlayView})[state.tab]();
+  labelTables();
+}
+// On phones each table row becomes its own small card, so every cell needs its column name next to it.
+function labelTables() {
+  document.querySelectorAll("#main table.data").forEach(t => {
+    const rows = [...t.rows]; if (!rows.length) return;
+    const names = [...rows[0].cells].map(c => c.textContent.trim());
+    rows[0].classList.add("headrow");
+    if (rows[0].cells.length > 4) t.classList.add("rowcards");   // (not "cards": that is the game-card grid)
+    rows.slice(1).forEach(r => [...r.cells].forEach((c, i) => {
+      if (c.dataset.label == null) c.dataset.label = names[i] || "";
+      const bk = /DraftKings|FanDuel/.exec(c.dataset.label);        // a sportsbook's column: show its logo too (owner)
+      if (bk) c.dataset.book = bk[0];
+    }));
+  });
+}
+
+
+/* ---------- DraftKings live, read straight from this browser (DraftKings lets websites do this) ---------- */
+const DK_NBA = "42648", DK_SUB = "4511";
+const DK_URL = "https://sportsbook-nash.draftkings.com/sites/US-NY-SB/api/sportscontent/controldata/league/leagueSubcategory/v1/markets"
+  + `?isBatchable=false&templateVars=${DK_NBA}`
+  + "&eventsQuery=" + encodeURIComponent(`$filter=leagueId eq '${DK_NBA}' AND clientMetadata/Subcategories/any(s: s/Id eq '${DK_SUB}')`)
+  + "&marketsQuery=" + encodeURIComponent(`$filter=clientMetadata/subCategoryId eq '${DK_SUB}' AND tags/all(t: t ne 'SportcastBetBuilder')`)
+  + "&include=Events&entity=events";
+const NICK = {hawks:"ATL",celtics:"BOS",nets:"BKN",hornets:"CHA",bulls:"CHI",cavaliers:"CLE",mavericks:"DAL",nuggets:"DEN",
+  pistons:"DET",warriors:"GS",rockets:"HOU",pacers:"IND",clippers:"LAC",lakers:"LAL",grizzlies:"MEM",heat:"MIA",bucks:"MIL",
+  timberwolves:"MIN",pelicans:"NO",knicks:"NY",thunder:"OKC",magic:"ORL","76ers":"PHI",suns:"PHX","trail blazers":"POR",
+  blazers:"POR",kings:"SAC",spurs:"SA",raptors:"TOR",jazz:"UTAH",wizards:"WSH"};
+const nickCode = n => { n = String(n || "").toLowerCase();
+  return Object.keys(NICK).sort((a, b) => b.length - a.length).map(k => n.endsWith(k) ? NICK[k] : "").find(Boolean) || ""; };
+const dkNum = s => s == null ? null : Number(String(s).replace("−", "-").replace("+", ""));
+function parseDK(d) {
+  const games = {}, kind = {};
+  for (const e of d.events || []) {
+    if (e.status && e.status !== "NOT_STARTED") continue;
+    const side = {}; for (const p of e.participants || []) side[p.venueRole] = nickCode(p.name);
+    if (side.Home && side.Away) games[e.id] = {key: `${side.Away}@${side.Home}`};
+  }
+  for (const m of d.markets || []) kind[m.id] = [String(m.eventId), (m.marketType || {}).name || m.name];
+  for (const s of d.selections || []) {
+    const [ev, mt] = kind[s.marketId] || []; const g = games[ev]; if (!g) continue;
+    const o = dkNum((s.displayOdds || {}).american), main = (s.tags || []).includes("MainPointLine"), t = s.outcomeType;
+    if (mt === "Moneyline" && (t === "Home" || t === "Away")) g[t.toLowerCase() + "_ml_close"] = o;
+    else if (mt === "Spread" && main && (t === "Home" || t === "Away")) { g[t.toLowerCase() + "_spread_odds_close"] = o; if (t === "Home") g.spread_close = s.points; }
+    else if (mt === "Total" && main && (t === "Over" || t === "Under")) { g[t.toLowerCase() + "_odds_close"] = o; g.total_close = s.points; }
+  }
+  return Object.fromEntries(Object.values(games).map(g => [g.key, g]));
+}
+const DK_KEYS = [["spread_close", "Spread", "spread"], ["total_close", "Total", "total"], ["away_ml_close", "Away ML", "away_ml"],
+  ["home_ml_close", "Home ML", "home_ml"], ["home_spread_odds_close", "Home spread price", "home_spread_odds"],
+  ["away_spread_odds_close", "Away spread price", "away_spread_odds"], ["over_odds_close", "Over price", "over_odds"],
+  ["under_odds_close", "Under price", "under_odds"]];
+state.dkLive = {}; state.dkSeen = {}; state.dkAt = null; state.dkOk = null;
+async function pollDK() {
+  try {
+    const r = await fetch(DK_URL, {cache: "no-store"}); if (!r.ok) throw new Error(r.status);
+    const now = new Date().toISOString(), fresh = parseDK(await r.json()); let changed = false;
+    for (const [key, g] of Object.entries(fresh)) {
+      const old = state.dkLive[key];
+      if (old) for (const [k, what, mk] of DK_KEYS)
+        if (old[k] != null && g[k] != null && old[k] !== g[k]) {
+          (state.dkSeen[key] = state.dkSeen[key] || []).push({at: now, what, key: mk, from: old[k], to: g[k], book: "DraftKings"});
+          changed = true;
+        }
+      if (!old) changed = true;
+      state.dkLive[key] = g;
+    }
+    state.dkAt = new Date(); state.dkOk = true;
+    if (changed || Date.now() - (state.dkSent || 0) > 5 * 60e3) sendToRelay(fresh);
+    if (changed && (state.tab === "games" || state.tab === "moves")) render();
+    } catch (_) { state.dkOk = false; updateDKPill(); }
+}
+async function sendToRelay(games) {
+  // Website only: share this browser's DraftKings reading so it lands in the history even with the Mac off.
+  if (!STATIC || !dataKey || !window.RELAY_URL) return;
+  try {
+    const enc = new TextEncoder();
+    const base = await crypto.subtle.importKey("raw", dataKey, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]);
+    const wk = await crypto.subtle.sign("HMAC", base, enc.encode("nba-model-relay-write"));
+    const key = await crypto.subtle.importKey("raw", wk, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]);
+    const body = JSON.stringify({games: Object.fromEntries(Object.entries(games).map(([k, g]) => {
+      const {key: _, ...rest} = g; return [k, rest]; }))});
+    const sig = b64e(new Uint8Array(await crypto.subtle.sign("HMAC", key, enc.encode(body))));
+    await fetch(window.RELAY_URL + "/dk", {method: "POST", headers: {"Content-Type": "application/json", "X-Sig": sig}, body});
+    state.dkSent = Date.now();
+  } catch (_) { /* the cloud still has ESPN's copy */ }
+}
+
+function updateDKPill() {
+  const el = document.querySelector("#dkpill"); if (!el) return;
+  el.innerHTML = state.dkOk ? `<span class="livedot"></span>DraftKings live <b>${state.dkAt.toLocaleTimeString([], {hour: "numeric", minute: "2-digit", second: "2-digit"})}</b>`
+    : state.dkOk === false ? "DraftKings live: couldn't load (using the saved copy)" : "DraftKings live: loading…";
+}
+
+
+/* ---------- Live scoreboard (straight from ESPN, which lets any website read it) ---------- */
+state.live = {};
+async function pollScores() {
+  const days = [...new Set(((state.pred && state.pred.games) || []).map(g => g.date))];
+  if (!days.length) return;
+  let changed = false;
+  for (const d of days) {
+    try {
+      const j = await (await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${d.replaceAll("-", "")}`, {cache: "no-store"})).json();
+      for (const e of j.events || []) {
+        const c = e.competitions[0], st = c.status, t = {};
+        for (const x of c.competitors) t[x.homeAway] = x;
+        const key = `${t.away.team.abbreviation}@${t.home.team.abbreviation}`;
+        const v = {state: st.type.state, detail: st.type.shortDetail, away: Number(t.away.score), home: Number(t.home.score),
+                   neutral: !!c.neutralSite, city: ((c.venue || {}).address || {}).city || ""};
+        if (JSON.stringify(state.live[key]) !== JSON.stringify(v)) { state.live[key] = v; changed = true; }
+      }
+    } catch (_) { /* keep the last scores */ }
+  }
+  if (changed && (state.tab === "games" || state.tab === "accuracy")) render();
+}
+// Special games, from ESPN's own label: NBA Cup, play-in, playoff round and game, Finals.
+function eventBadge(ev) {
+  if (!ev) return "";
+  const e = String(ev).replace(/^NBA Play-In - /, "Play-In · ").replace(/^NBA In-Season Tournament/, "NBA Cup (In-Season Tournament)")
+    .replace(/ - /g, " · ");
+  const icon = /Finals/i.test(ev) && !/(East|West|Conference) /i.test(ev) ? "🏆" : /Cup|In-Season Tournament/i.test(ev) ? "🏆"
+    : /Play-In/i.test(ev) ? "🎟️" : /Makeup|Rescheduled|Postponed/i.test(ev) ? "📅"
+    : /City|Paris|London|Berlin|Mexico|Abu Dhabi|Global|Games? 20/i.test(ev) ? "🌍" : "🔥";
+  const big = /NBA Finals|Championship|Game 7/i.test(ev);
+  return `<span class="badge event ${big ? "big" : ""}">${icon} ${esc(e)}</span>`;
+}
+function isNeutral(g) {
+  const s = state.live[`${g.away}@${g.home}`];
+  return !!(g.neutral || (s && s.neutral));
+}
+function siteLabel(g, side) {
+  return isNeutral(g) ? "neutral court" : side;
+}
+
+function moveAlerts(g) {
+  // What the line has done since it opened, compared with our number (DraftKings via ESPN).
+  const m = g.moves || {}, out = [];
+  for (const [mk, v] of Object.entries(m)) {
+    const name = mk === "spread" ? `${g.home} spread` : "Total";
+    const f = mk === "spread" ? sp : f1;
+    const path = v.moved ? `${f(v.open)} → ${f(v.now)}` : `${f(v.now)} (unchanged)`;
+    const ours = `we say ${f(v.ours)}`;
+    if (v.kind === "toward") out.push(`<div class="mv toward">📈 <b>${name} moving our way:</b> ${path} · ${ours}.
+      ${Math.abs(v.gap_now) >= 2 ? "Still value left — bet soon." : "Most of the value is gone."}</div>`);
+    else if (v.kind === "past") out.push(`<div class="mv against">↔️ <b>${name} moved past our number:</b> ${path} · ${ours}.
+      Any value is now on the other side.${v.big ? " A move this big usually means injury news." : ""}</div>`);
+    else if (v.kind === "against") out.push(`<div class="mv against">⚠️ <b>${name} moving against us:</b> ${path} · ${ours}.
+      The market may know something${v.big ? " — a move this big usually means injury news" : " (check injuries)"}.</div>`);
+    else out.push(`<div class="mv waiting">⏰ <b>${name} hasn't moved yet:</b> ${path} · ${ours}.
+      Lines like this usually move our way — early is best.</div>`);
+  }
+  return out.length ? `<div class="mvs">${out.join("")}</div>` : "";
+}
+
+function recLine(g, t) {
+  const r = (g.record || {})[t];
+  return r ? `<small class="rec">${r[0]}-${r[1]} this season</small>` : "";
+}
+/* Starting lineups from NBA.com: Expected (projection) until teams submit them ~30 min before tip, then Confirmed */
+function lineupLine(g) {
+  const lu = g.lineups || {}, H = lu.home, A = lu.away;
+  if (!H && !A) return `<div class="lineup warn">⚠️ <b>Starting lineups:</b> not posted yet.
+    <span class="dim">Less accurate until lineups are confirmed: these picks use the injury report's best guess of who plays,
+    so they can shift when teams confirm their starters about 30 minutes before tip-off.</span></div>`;
+  const both = H && A && H.status === A.status;
+  const conf = s => s && s.status === "Confirmed";
+  const icon = conf(H) && conf(A) ? "✅" : "📋";
+  const status = both ? (conf(H) ? "<b>confirmed</b>" : "<b>expected</b>")
+    : ["home", "away"].map(s => `${esc(g[s])} <b>${lu[s] ? lu[s].status.toLowerCase() : "not posted"}</b>`).join(" · ");
+  const note = conf(H) && conf(A) ? "The picks below use the confirmed starters."
+    : conf(H) || conf(A) ? "Picks use the confirmed starters where posted, and the injury report for the rest."
+    : "Less accurate until lineups are confirmed: these picks use the injury report's best guess of who plays, so they can shift when teams confirm their starters about 30 minutes before tip-off.";
+  const raised = ["home", "away"].flatMap(s => ((lu[s] || {}).raised || []).map(n => `${esc(n)} (${esc(g[s])})`));
+  const list = ["home", "away"].filter(s => lu[s]).map(s =>
+    `<div><b>${esc(g[s])}</b> ${lu[s].starters.map(esc).join(", ")}</div>`).join("");
+  return `<div class="lineup ${conf(H) && conf(A) ? "ok" : "warn"}">${conf(H) && conf(A) ? icon : "⚠️"} <b>Starting lineups:</b> ${status}.
+    <span class="dim">${note}</span>
+    ${raised.length ? `<div class="raised">Confirmed starting, now counted as playing: <b>${raised.join(", ")}</b></div>` : ""}
+    <details><summary>See starters</summary>${list}</details></div>`;
+}
+function h2hLine(g) {
+  const h = g.h2h || {};
+  if (!h.games) return `<div class="h2h">🤝 Head to head: first meeting since our data starts (2023-24)</div>`;
+  const lead = h.wins[g.home] === h.wins[g.away] ? `Tied ${h.wins[g.home]}–${h.wins[g.away]}`
+    : h.wins[g.home] > h.wins[g.away] ? `${esc(g.home)} leads ${h.wins[g.home]}–${h.wins[g.away]}` : `${esc(g.away)} leads ${h.wins[g.away]}–${h.wins[g.home]}`;
+  return `<div class="h2h"><div>🤝 Head to head: <b>${lead}</b></div>
+    <div class="dim">${h.games} game${h.games === 1 ? "" : "s"} since 2023-24 · last meeting: ${esc(h.last)}</div></div>`;
+}
+
+function scoreboard(g) {
+  const s = state.live[`${g.away}@${g.home}`];
+  if (!s || s.state === "pre") return `<div class="score" style="font-size:22px;color:var(--muted)">vs</div>`;
+  const lead = s.home > s.away ? "home" : s.away > s.home ? "away" : "";
+  return `<div class="score live-score"><span class="${lead === "home" ? "" : "trail"}">${s.home}</span><span class="dash">–</span><span class="${lead === "away" ? "" : "trail"}">${s.away}</span></div>`;
+}
+function statusLine(g) {
+  const s = state.live[`${g.away}@${g.home}`];
+  if (s && s.state === "in") return `<span class="status is-live"><span class="livedot red"></span>LIVE · ${esc(s.detail)}</span>`;
+  if (s && s.state === "post") {
+    const won = s.home > s.away ? g.home : g.away;
+    const right = won === g.favorite;
+    return `<span class="status">🏁 Game over · ${right ? `✅ ${esc(won)} won, like we picked` : `❌ ${esc(won)} won, we picked ${esc(g.favorite)}`}</span>`;
+  }
+  return `<span class="status">🕖 ${esc(g.tip)}</span>`;
+}
+
+/* ---------- Games ---------- */
+function dayLabel(d) {
+  const t = new Date(), iso = x => x.toLocaleDateString("en-CA"), tm = new Date(t); tm.setDate(t.getDate() + 1);
+  const name = new Date(d + "T12:00").toLocaleDateString(undefined, {weekday: "long", month: "long", day: "numeric"});
+  return d === iso(t) ? "Tonight · " + name : d === iso(tm) ? "Tomorrow · " + name : name;
+}
+
+function gameCard(g, bets, i) {
+  // headline: our model's win chance, with each sportsbook's right next to it
+  const homeWin = g.p_home, awayWin = 1 - g.p_home, dk = g.dk || {}, fd = g.fd || {};
+  const modelHome = g.p_home, modelAway = 1 - g.p_home;
+  const spreadBook = b => b.spread_close == null ? "–" : `${g.home} ${sp(b.spread_close)}`;
+  const totBook = b => b.total_close == null ? "–" : f1(b.total_close);
+  const mlBook = b => b.home_ml_close == null ? "–" : `${g.home} ${odds(b.home_ml_close)}<br>${g.away} ${odds(b.away_ml_close)}`;
+  const be = o => o < 0 ? -o / (-o + 100) : 100 / (o + 100);
+  const bookPct = b => {               // the book's own win chance, with its cut taken out
+    if (b.home_ml_close == null || b.away_ml_close == null) return "–";
+    const h = be(b.home_ml_close), a = be(b.away_ml_close);
+    return `${g.home} ${pct(h / (a + h))}<br>${g.away} ${pct(a / (a + h))}`;
+  };
+  // owner (21 Nov): only our predicted winner's spread/moneyline, "Opened at" under every sportsbook number,
+  // our % on the moneyline row, and which side (Over/Under) we pick on the total
+  const homeFav = modelHome >= 0.5, fav = homeFav ? g.home : g.away;
+  const tg = ((state.moves || {}).games || []).find(x => x.home === g.home && x.away === g.away) || {};
+  const opened = name => { const o = {...(((tg.books || []).find(b => b.book === name) || {}).first || {})};
+    if (name === "DraftKings") { if (o.spread == null) o.spread = g.spread_open; if (o.total == null) o.total = g.total_open; }
+    return o; };
+  const dkO = opened("DraftKings"), fdO = opened("FanDuel");
+  const op = (v, f) => v == null ? "" : `<span class="moved">Opened at ${f(v)}</span>`;
+  const sideSp = v => v == null ? null : homeFav ? v : -v;
+  const spreadBook2 = (b, o) => b.spread_close == null ? "–" : `${fav} ${sp(sideSp(b.spread_close))}${op(sideSp(o.spread), sp)}`;
+  const totBook2 = (b, o) => b.total_close == null ? "–" : `${f1(b.total_close)}${op(o.total, f1)}`;
+  const mlKey = homeFav ? "home_ml" : "away_ml";
+  const mlBook2 = (b, o) => b[mlKey + "_close"] == null ? "–" : `${fav} ${odds(b[mlKey + "_close"])}${op(o[mlKey], odds)}`;
+  const tLine = dk.total_close ?? fd.total_close;
+  const tSide = tLine == null || Math.abs(g.pred_total - tLine) < 0.5 ? "" : g.pred_total > tLine ? "Over " : "Under ";
+  const top = bets.filter(b => b.game_id === g.game_id).sort((a, b) => b.ev - a.ev)[0];
+  const outList = ["home", "away"].flatMap(s => (g.out[s] || []).map(p =>
+      `<span class="chip">${esc(g[s])} · ${esc(p.name)} ${p.chance === 0 ? "out" : pct(p.chance) + " to play"}</span>`));
+  // players who will play but on limited minutes (their news note says "minutes restriction")
+  outList.push(...["home", "away"].flatMap(s => ((g.restricted || {})[s] || []).map(n =>
+      `<span class="chip">${esc(g[s])} · ${esc(n)} ⏱️ confirmed minutes restriction</span>`)));
+  // owner (21 Nov): list every injury, no "+N more" button
+  const outs = outList.join("");
+  const inj = g.injury_total != null && Math.abs(g.injury_total) >= 0.5
+    ? `<div class="inj-note">Injuries move the predicted total <b>${g.injury_total > 0 ? "up" : "down"} ${Math.abs(g.injury_total).toFixed(1)} points</b>.</div>` : "";
+  return `<article class="card enter" style="--i:${i};--away-c:${color(g.home)};--home-c:${color(g.away)}">
+    <div class="card-head">
+      <div class="head-meta"><span class="badge">${esc(g.favorite)} favored</span>
+        ${eventBadge(g.event)}
+        ${isNeutral(g) ? `<span class="badge neutral">📍 Neutral court${(state.live[`${g.away}@${g.home}`] || {}).city ? " · " + esc(state.live[`${g.away}@${g.home}`].city) : ""}</span>` : ""}
+        ${statusLine(g)}</div>
+      <div class="mu">
+        <div class="tm">${logo(g.home)}<div>${esc(g.home)}<small>${esc(TEAMS[g.home] || "")} · ${siteLabel(g, "home")}</small>${recLine(g, g.home)}</div></div>
+        ${scoreboard(g)}
+        <div class="tm home"><div>${esc(g.away)}<small>${esc(TEAMS[g.away] || "")} · ${siteLabel(g, "away")}</small>${recLine(g, g.away)}</div>${logo(g.away)}</div>
+      </div>
+    </div>
+    <div class="card-body">
+      ${h2hLine(g)}
+      ${lineupLine(g)}
+      <div class="predscore"><span class="lbl">🎯 Predicted score</span>
+        <span><b>${esc(g.home)} ${Math.round(g.pred_home)}</b> – <b>${esc(g.away)} ${Math.round(g.pred_away)}</b></span></div>
+      <div class="winrow"><span>${pct(homeWin)}</span>
+        <div class="winbar"><i style="width:${(100 * homeWin).toFixed(1)}%;background:${color(g.home)}"></i><i style="width:${(100 * awayWin).toFixed(1)}%;background:${color(g.away)}"></i></div>
+        <span>${pct(awayWin)}</span></div>
+      <div class="wincmp">
+        <div class="wc-h">Chance to win tonight</div>
+        <div class="wc-row model"><span class="wc-src">🎯 Our model</span><span class="wc-pct"><b>${esc(g.home)} ${pct(homeWin, 1)}</b> · ${esc(g.away)} ${pct(awayWin, 1)}</span></div>
+        ${[["DraftKings", dk], ["FanDuel", fd]].map(([name, b]) => b.home_ml_close == null || b.away_ml_close == null ? "" : (() => {
+          const hb = be(b.home_ml_close), ab = be(b.away_ml_close);
+          return `<div class="wc-row"><span class="wc-src">${book(name)}</span><span class="wc-pct"><b>${esc(g.home)} ${pct(hb / (hb + ab), 1)}</b> · ${esc(g.away)} ${pct(ab / (hb + ab), 1)}
+            <small>${esc(g.home)} ${odds(b.home_ml_close)} / ${esc(g.away)} ${odds(b.away_ml_close)}</small></span></div>`; })()).join("")}
+      </div>
+      <div class="wintext">Predicted total points (both teams): <b>${Math.round(g.pred_total)}</b></div>
+      <table class="bk lines">
+        <tr><th></th><th>Our model</th><th>${book("DraftKings", 14)}</th><th>${book("FanDuel", 14)}</th></tr>
+        <tr><td>Spread</td><td class="model">${fav} ${sp(homeFav ? -g.pred_margin : g.pred_margin)}</td><td>${spreadBook2(dk, dkO)}</td><td>${spreadBook2(fd, fdO)}</td></tr>
+        <tr><td>Total</td><td class="model">${tSide}${f1(g.pred_total)}</td><td>${totBook2(dk, dkO)}</td><td>${totBook2(fd, fdO)}</td></tr>
+        <tr><td>Moneyline</td><td class="model">${fav} ${pct(homeFav ? modelHome : modelAway, 1)}</td><td>${mlBook2(dk, dkO)}</td><td>${mlBook2(fd, fdO)}</td></tr>
+      </table>
+      ${moveAlerts(g)}
+      ${g.trust != null && g.trust < 1 ? `<div class="fade">⏳ Close to tip-off: our model counts for ${Math.round(100 * g.trust)}% of its usual weight, and 0% at tip-off. In past seasons, by tip-off the sportsbook's line was the best guess, so late edges shrink.</div>` : ""}
+      ${top ? `<div class="value">💰 Best value: ${esc(pickName(top.pick))} at ${book(top.book)} ${odds(top.odds)}
+        <span>— we expect this bet to win ${pct(top.chance)} of the time. At ${odds(top.odds)} the sportsbook's price treats it as a ${pct(top.breakeven)} chance, so the bet is underpriced by ${(100 * (top.chance - top.breakeven)).toFixed(0)} points.</span>
+        <small class="why">Our chance blends our model with the sportsbook's own line, the way professional bettors do, so it isn't overconfident.</small></div>`
+        : `<div class="noedge">🤝 No edge on this game: our chances and the sportsbooks' prices agree, so no bet here has our chance at least 4 points above what its odds need.</div>`}
+      ${(g.safe || []).length ? `<div class="alts safe"><div class="alts-h">🔒 Safest picks <small>bets on tonight's game that we give a 70%+ chance to win, where our chance is at least as high as the sportsbook's</small></div>${g.safe.slice(0, 2).map(x =>
+        `<div class="alt-row"><b>${esc(pickName(x.pick))}</b><span>${book(x.book)} ${odds(x.odds)}</span><span>our chance ${pct(x.chance)} · sportsbook's chance ${pct(x.breakeven)}</span></div>`).join("")}</div>` : ""}
+      ${(g.alts || []).length ? `<div class="alts"><div class="alts-h">🎯 Bigger payouts <small>bets that win less often, but pay more than our chance says they should</small></div>${g.alts.slice(0, 2).map(x =>
+        `<div class="alt-row"><b>${esc(pickName(x.pick))}</b><span>${book(x.book)} ${odds(x.odds)}</span><span>our chance ${pct(x.chance)} · sportsbook's chance ${pct(x.breakeven)}</span></div>`).join("")}</div>` : ""}
+      ${outs ? `<div class="chips">${outs}</div>` : ""}${inj}
+    </div>
+  </article>`;
+}
+
+// "Sun, Nov 22 · 7:00 PM" under every pick's game (owner: picks can be for tomorrow)
+// each logo right next to its own team (owner): [logo] PHI vs [logo] MIL
+function gameCell(x) {
+  const [away, home] = String(x.game).split(" @ ");
+  return `<span class="gcell">${logo(home, 20)} ${esc(home)} <span class="muted">vs</span> ${logo(away, 20)} ${esc(away)}</span>`;
+}
+// owner: an empty Value bets / Bigger payouts tab explains WHY (the rule, today's biggest gap, when they show up)
+function emptyWhy(what) {
+  const p = state.pred || {}, seen = new Set();
+  const gaps = [...(p.favorable || []), ...(p.ours || []), ...(p.safe || [])]
+    .filter(x => x.breakeven != null && !seen.has(pickKey(x)) && seen.add(pickKey(x)))
+    .map(x => ({x, g: 100 * ((x.chance || 0) - x.breakeven)})).sort((a, b) => b.g - a.g).slice(0, 3);
+  const rows = gaps.map(({x, g}) => `<li><b>${esc(pickName(x.pick))}</b> (${esc(vs(x.game))}): we say ${pct(x.chance, 1)}, the sportsbook says ${pct(x.breakeven, 1)} → <b>${g >= 0 ? `${g.toFixed(1)}% higher` : `${(-g).toFixed(1)}% lower`}</b></li>`).join("");
+  return `<div class="empty" style="text-align:left">
+    <p style="margin:0 0 8px"><b>No ${what} right now.</b> These need our chance to be at least <b>4% higher</b> than the sportsbook's, and nothing is that far off right now.</p>
+    ${rows ? `<p style="margin:0 0 4px">Today's biggest gaps:</p><ul style="margin:0 0 8px 18px;padding:0">${rows}</ul>` : ""}
+    <p style="margin:0" class="muted">That's normal, especially on small slates and later in the day, after the sportsbooks have sharpened their lines.
+      They show up most often <b>early</b>, when lines first open, or <b>right after injury news</b>. Skipping is better than forcing a bet.</p></div>`;
+}
+function pickWhen(x) {
+  const g = ((state.pred || {}).games || []).find(g => g.game_id === x.game_id);
+  if (!g || !g.date) return "";
+  const d = new Date(g.date + "T12:00").toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric"});
+  return `<div class="muted" style="font-size:12px;margin-top:2px">${esc(d)}${g.tip ? " · " + esc(g.tip) : ""}</div>`;
+}
+// Start-time order everywhere (owner): games, and picks by their game's tip-off
+const startOf = g => String(g.start_utc || "");
+const byStart = (a, b) => startOf(a).localeCompare(startOf(b));
+function pickStart(x) {
+  const g = ((state.pred && state.pred.games) || []).find(g => g.game_id === x.game_id);
+  return g ? startOf(g) : "9";                               // unknown start: last
+}
+const byPickStart = (a, b) => pickStart(a).localeCompare(pickStart(b));
+function gamesView() {
+  const p = state.pred;
+  if (!p || !p.games || !p.games.length) return `<div class="empty">No upcoming games found. Press <b>🔄 Refresh</b>.</div>`;
+  const warn = (p.warnings || []).map(w => `<div class="warn">⚠️ ${esc(w)}</div>`).join("");
+  const days = [...new Set(p.games.map(g => g.date))].sort();
+  if (!days.includes(state.day)) state.day = days[0];
+  const pick = days.length > 1 ? `<div class="actions" style="margin-top:16px">${days.map(d =>
+    `<button class="btn secondary daybtn ${d === state.day ? "on" : ""}" data-day="${d}">${esc(dayLabel(d).split(" · ")[0])} · ${p.games.filter(g => g.date === d).length} games</button>`).join("")}</div>` : "";
+  const shown = p.games.filter(g => g.date === state.day).sort(byStart);   // owner: earliest game at the top
+  return `${glossary(["predscore", "winchance", "favored", "moneyline", "odds", "spread", "total", "fair", "opening", "move", "lineups", "neutral", "h2h"])}
+    ${warn}${pick}
+    <h2 class="section-title">${dayLabel(state.day)} · ${shown.length} games</h2>
+    <div class="cards one-col">${shown.map((g, i) => gameCard(g, p.bets || [], i)).join("")}</div>`;
+}
+
+/* ---------- Plain-English dictionary (owner rule: every term on the site is explained for beginners) ---------- */
+const GLOSSARY = {
+  odds: ["Odds (the price)", "How much a bet pays. <b>−150</b> means you bet $150 to win $100. <b>+150</b> means you bet $100 to win $150. A minus sign = the favourite (pays less), a plus sign = the underdog (pays more). When you win you also get your bet back."],
+  moneyline: ["Moneyline (ML)", "A bet on who wins the game, nothing else. \"ATL ML −237\" = bet $237 on the Hawks to win $100 if they win."],
+  spread: ["Spread", "A head start in points that makes the game even. <b>ATL −6.5</b> = the Hawks must win by 7 or more. <b>CHA +6.5</b> = the Hornets win the bet if they win, or lose by 6 or less. Spreads on this site are written for the home team unless the team is named."],
+  total: ["Total (Over / Under)", "A bet on both teams' points added together. <b>Over 218.5</b> wins if they score 219 or more combined; <b>Under 218.5</b> wins at 218 or less."],
+  push: ["Push", "A tie with the line (for example a 7-point win on a −7 spread). Your bet is returned: no win, no loss. A .5 line (−6.5) can never push."],
+  favored: ["Favourite / underdog", "The <b>favourite</b> is the team expected to win (minus odds, minus spread). The <b>underdog</b> is expected to lose (plus odds, plus spread)."],
+  predscore: ["Predicted score", "What our model thinks the final score will be. Games rarely land exactly on it — it's the middle of what usually happens."],
+  winchance: ["Chance to win", "How often we think a team wins this game. 76% means: in 100 games like this one, it wins about 76 and loses about 24. Next to it are DraftKings' and FanDuel's chances, worked out from their odds (with their built-in profit taken out)."],
+  fair: ["Fair odds", "The odds that would match our chance exactly, with no sportsbook profit built in. If a sportsbook pays <i>more</i> than our fair odds, that bet is good value."],
+  weexpect: ["We expect …%", "Our chance that this bet wins. It mixes our model with the sportsbook's own line (25% our model for spreads, 40% for totals), which tested more accurate than either alone. In the last 6 hours before tip-off our model's share shrinks toward zero, because by then the sportsbook's line is very sharp."],
+  bookexpects: ["DraftKings / FanDuel expects …%", "The chance the sportsbook's odds imply. At −110 it's 52.4%: the bet has to win that often just to break even."],
+  edge: ["Edge", "Our chance minus the chance the odds need, in percentage points. 58% vs 52% = a 6-point edge. Bigger is better. We only show bets with an edge of 4+ points, because smaller edges lost money in past seasons."],
+  value: ["Value bet 💰", "A bet where we think the team wins more often than the odds say — our chance is at least 4 percentage points higher than what the odds need (58% vs 52% = 6 points). Not a sure thing: it means the price is good, so over many such bets you should come out ahead."],
+  breakeven: ["Break-even (needs to hit)", "How often a bet at these odds must win for you to neither win nor lose money over many bets. −110 = 52.4%, +100 = 50%, +200 = 33.3%."],
+  alt: ["Alternate lines (bigger payouts)", "The same bet at a different number. Instead of ATL −6.5 at −110, you can take ATL −10.5 at +150 (pays more, wins less often) or ATL −2.5 at −200 (pays less, wins more often)."],
+  safest: ["Safest picks 🔒", "Bets we give a 70%+ chance to win at a fair price. They win often but pay little (−300 = bet $300 to win $100), so one loss can wipe out several wins."],
+  ours: ["Our prediction 🔮", "Our pick for every game: the team we think <b>wins</b>, a <b>spread</b> and a <b>total</b>. The line is our number with the decimal dropped, then the .5 just below (we say Hawks by 8.7 → Hawks −7.5; 218.4 points → Over 217.5), or the Under just above our number when the sportsbook's total is higher than ours. It's our prediction, not a value bet: check the % — some are close to a coin flip."],
+  favorable: ["Favorable 👍", "Any pick where our chance to win is higher than the sportsbook's price needs (even by 1 point). Weaker than a <b>value bet</b> (4+ points): small edges like these didn't make money on their own in past seasons, so treat them as parlay fillers, not sure things."],
+  parlay: ["Parlay", "Several bets combined into one. It pays much more, but EVERY pick must win — one wrong pick loses the whole bet. Its chance is each pick's chance multiplied together (three 70% picks ≈ 34%)."],
+  sgp: ["Same Game Parlay", "A parlay with two or more picks from the same game. Sportsbooks price these themselves (the picks affect each other), so the odds can differ from a normal parlay. A team's moneyline and its spread can't be combined at all."],
+  opening: ["Opening line", "The first number a sportsbook posts for a game, usually the day before. It's the easiest one to beat — the book hasn't heard all the news yet."],
+  closing: ["Closing line", "The last number before tip-off. By then all the news is out and big bettors have moved it, so it's the sharpest number there is. Beating it over time is the best sign of a good bettor."],
+  move: ["Line move 📈", "When a sportsbook changes its number or odds (injury news, lots of money on one side). 📈 moving our way = the book is moving toward our number (good, bet early). ⏰ hasn't moved yet = still at the old number. ⚠️ moving against us = warning. ↔️ moved past our number = the value is gone."],
+  betsoon: ["⏰ Bet soon", "The line hasn't caught up with our number yet. In past games, lines usually moved our way later, so the current price is likely the best one."],
+  lineups: ["Starting lineups: expected / confirmed", "Who starts the game. <b>Expected</b> = a best guess (early in the day). <b>Confirmed</b> = official, about 30 minutes before tip-off. Our picks get more accurate once lineups are confirmed."],
+  neutral: ["📍 Neutral court", "Neither team is at home (for example NBA Cup games in Las Vegas), so neither gets home-court advantage."],
+  h2h: ["Head to head", "How these two teams did against each other in past meetings. Shown for interest only — it didn't improve predictions in our tests."],
+  injstatus: ["Injury statuses", "<b>Out</b> = won't play. <b>Doubtful</b> = very unlikely to play (1–6%). <b>Questionable / game-time decision</b> = could go either way (34–60% depending on role). <b>Probable</b> = very likely to play (about 93–97% for starters). <b>Minutes restriction</b> = plays, but fewer minutes than usual."],
+  linevalue: ["Line value (beat the close)", "How many points the line moved toward our pick between when we made it and tip-off. Positive = we got a better number than the final line — the clearest early sign the picks are good, long before wins and losses settle."],
+  record: ["Record (W-L-P)", "Wins – losses – pushes. 12-8-1 = 12 won, 8 lost, 1 push."],
+  hit: ["Hit %", "How often the picks won, pushes left out. For spreads and totals at −110 you need 52.4% to make money."],
+  margin: ["Margin", "How many points the home team won (or lost) by. Hawks 118, Hornets 104 = a margin of +14 for the Hawks."],
+  miss: ["Average miss", "How far our predicted score was from the real one, on average, in points. Lower is better. Even the sportsbooks miss by about 11 points on the margin — basketball is random."],
+  calib: ["\"When it says X%, does it happen X%?\"", "A honesty check on our chances: of all the games where we said a team had about 65%, did it really win about 65% of them? If yes, our percentages can be trusted."],
+  replayed: ["Replayed games", "Past games re-predicted the fair way: each one using only games played before it (never its own result), like predicting it on the day."],
+  live: ["Live games", "Games graded on the prediction we actually made right before tip-off (from 20 Nov 2026 on)."],
+  betslip: ["Betslip", "The list of bets you're about to place in the DraftKings or FanDuel app. Our links put the bet there for you — nothing is placed until you confirm in the app."],
+};
+function glossary(keys, title = "📖 What do these words mean?") {
+  return "";   // owner (20 Nov): the "What do these words mean?" boxes are corny — removed on every tab
+  return `<details class="howto gloss"><summary>${title}</summary>${keys.map(k => GLOSSARY[k])
+    .filter(Boolean).map(([t, d]) => `<p><b>${t}:</b> ${d}</p>`).join("")}</details>`;
+}
+const BEGINNER_GUIDE = `<details class="howto gloss start"><summary>🆕 New to betting? Start here</summary>
+  <p><b>What this site does:</b> our model predicts every NBA game — the score, who wins, and by how much — and compares
+  that with DraftKings and FanDuel. When the sportsbook's odds look too generous compared with our numbers, that's a
+  <b>value bet</b>.</p>
+  <p><b>🏀 Picks</b> — every game tonight: predicted score, each team's chance to win, and the sportsbooks' numbers.<br>
+  <b>💰 Best bets</b> — the bets where we disagree most with the sportsbooks.<br>
+  <b>🎟️ Parlay builder</b> — combine picks into one bet and open it in DraftKings or FanDuel.<br>
+  <b>🩹 Injuries</b> — who's hurt and how likely they are to play.<br>
+  <b>📈 Odds tracker</b> — how the sportsbooks' numbers changed today.<br>
+  <b>📊 Results</b> — how right we've been.<br>
+  <b>📲 Phone alerts</b> — get a notification the moment a value bet shows up.</p>
+  <p><b>Important:</b> no bet is a sure thing. A 70% pick still loses 3 times out of 10. Bet small amounts you're OK losing,
+  and judge the picks over many bets, not one night.</p>
+  <p>Every tab has a <b>📖 What do these words mean?</b> section like this one.</p></details>`;
+
+/* ---------- Injuries ---------- */
+function injuriesView() {
+  const p = state.pred || {}, inj = p.injuries || {};
+  const games = (p.games || []).filter(g => !state.day || g.date === state.day);
+  if (!games.length) return `<div class="empty">No games found.</div>`;
+  const badge = r => r.play === 0 ? `<span class="st out">${esc(r.status || "Out")}</span>`
+    : r.play < 0.75 ? `<span class="st q">${esc(r.fantasy === "GTD" ? "Game-time decision" : r.status)} · ${pct(r.play)} to play</span>`
+    : `<span class="st p">${esc(r.status)}</span>`;
+  const team = t => {
+    const rows = inj[t] || [];
+    return `<div class="inj-team"><h3>${logo(t, 26)}${esc(t)} <small style="font-family:Inter;font-size:13px;color:var(--muted)">${esc(TEAMS[t] || "")}</small></h3>
+      ${rows.length ? `<div class="inj-list">${rows.map(r => `<div class="inj-row">
+          <div class="inj-top"><b>${esc(r.name)}</b>${badge(r)}</div>
+          <div class="inj-sub">${esc(r.detail || "Injury not given")}${r.back ? ` · est. return ${esc(niceDate(r.back))}` : ""}</div>
+          ${r.restricted && r.play > 0 ? `<div class="inj-sub">⏱️ Confirmed minutes restriction tonight</div>` : ""}
+        </div>`).join("")}</div>`
+        : `<div style="color:var(--muted);font-size:14px">Nobody listed.</div>`}</div>`;
+  };
+  return `<p class="intro">Every player on tonight's injury report (ESPN, refreshed with every update). <b>Out</b> players are
+    left out of the predictions.</p>
+    ${glossary(["injstatus"])}
+    
+    <h2 class="section-title">${state.day ? dayLabel(state.day) : "Tonight"} · Injuries</h2>
+    <div class="cards">${games.map((g, i) => `<article class="card enter" style="--i:${i};--away-c:${color(g.home)};--home-c:${color(g.away)}">
+      <div class="card-head"><div class="head-meta"><span class="status">🕖 ${esc(g.tip)}</span></div>
+        <div class="mu"><div class="tm">${logo(g.home, 28)}${esc(g.home)}</div><div class="score" style="font-size:22px;color:var(--muted)">vs</div><div class="tm home">${esc(g.away)}${logo(g.away, 28)}</div></div></div>
+      <div class="card-body">${team(g.home)}${team(g.away)}</div></article>`).join("")}</div>`;
+}
+
+/* ---------- Best bets ---------- */
+function betsView() {
+  // Three sub-tabs instead of three tables stacked on top of each other.
+  const pred = state.pred || {};
+  const lists = {value: [...(pred.bets || [])].sort(byPickStart), safe: safePicks(pred).sort(byPickStart),
+                 alts: [...(pred.alts || [])].sort(byPickStart)};
+  const tabs = [["value", "💰 Value bets"], ["safe", "🔒 Safest picks"], ["alts", "🎯 Bigger payouts"]];
+  const cur = state.betsTab || "value";
+  const bar = `<div class="subtabs">${tabs.map(([k, label]) =>
+    `<button class="subtab ${k === cur ? "on" : ""}" data-bets="${k}">${label} <span class="count">${lists[k].length}</span></button>`).join("")}</div>`;
+  const moveTag = x => x.move === "toward" || x.move === "waiting" ? `<span class="tag" style="color:var(--good)">⏰ bet soon</span>`
+    : x.move === "against" ? `<span class="tag" style="color:var(--bad)">⚠️ line moving against</span>` : "";
+  // Bet | Book, our chance | the book's chance, price | edge (how many points higher ours is)
+  // Read in order: what to bet and where, then the two chances side by side, then the edge.
+  const head = () => `<tr><th>Game</th><th>Bet</th><th class="num">We expect</th>
+      <th class="num">Book expects</th><th class="num">Edge</th></tr>`;
+  const row = (x, tag) => `<tr><td>${gameCell(x)}${pickWhen(x)}</td>
+      <td><div class="betline"><span><b>${esc(pickName(x.pick))}</b><span class="tag">${tag}</span>${moveTag(x)}</span>
+        </div>${slipButtons(x)}</td>
+      <td class="num pos">${pct(x.chance, 1)}</td><td class="num" data-label="${esc(x.book)} expects">${pct(x.breakeven, 1)}</td>
+      <td class="num pos edge">+${(100 * (x.chance - x.breakeven)).toFixed(1)}%</td></tr>`;
+  // safe rows: the edge can be negative now (the price is a label, not a filter)
+  const safeRow = (x, tag) => { const e = 100 * (x.chance - x.breakeven);
+    return `<tr><td>${gameCell(x)}${pickWhen(x)}</td>
+      <td><div class="betline"><span><b>${esc(pickName(x.pick))}</b><span class="tag">${tag}</span>${priceLabel(x.chance, x.odds)}</span>
+        </div>${slipButtons(x)}</td>
+      <td class="num pos">${pct(x.chance, 1)}</td><td class="num" data-label="${esc(x.book)} expects">${pct(x.breakeven, 1)}</td>
+      <td class="num edge ${e >= 2 ? "pos" : e >= 0 ? "muted" : "neg"}">${e >= 0 ? "+" : ""}${e.toFixed(1)}%</td></tr>`; };
+  let body;
+  if (cur === "value") body = `<p class="intro" style="margin-top:12px">The model's main picks: spread, total and moneyline bets where <b>our chance of winning is at least 4% higher than the sportsbook's</b>. Example: we say 58%, the sportsbook's price says 52% → 6% higher.</p>
+    ${lists.value.length ? `<div class="panel highlight"><table class="data bets">${head()}
+      ${lists.value.slice(0, 25).map(x => row(x, esc(x.market))).join("")}</table></div>`
+      : emptyWhy("value bets")}`;
+  else if (cur === "safe") body = `<p class="intro" style="margin-top:12px">Single bets we give a <b>70% or higher chance to win</b>.
+      Only prices of −350 or better (bet $35 to win $10). The label shows if the price is good: 👍 good price, ➖ fair price, ⚠️ pricey. Same bets as the Discord safe-bets channel.</p>
+    ${lists.safe.length ? `<div class="panel"><table class="data bets">${head()}
+      ${lists.safe.slice(0, 20).map(x => safeRow(x, x.market === "moneyline" ? "Moneyline" : x.market === "spread" ? "Alt spread" : "Alt total")).join("")}</table></div>`
+      : `<div class="empty">No safe picks at a fair price right now.</div>`}`;
+  else body = `<p class="intro" style="margin-top:12px">Alt lines come from FanDuel (and DraftKings when available; DraftKings blocks our cloud server). Riskier versions of the value bets: the same side, at a line further
+      away that pays more. Example: if Over 225.5 at −105 is a value bet, Over 235.5 at +240 wins less often but pays more.
+      One shows only if its main line is already a value bet and our chance stays at least 4% higher than the sportsbook's, with up to 2 per game.
+      In past seasons, alt lines our model liked on their own (without a main-line edge) mostly lost.</p>
+    ${lists.alts.length ? `<div class="panel"><table class="data bets">${head()}
+      ${lists.alts.slice(0, 20).map(x => row(x, x.market === "spread" ? "Alt spread" : "Alt total")).join("")}</table></div>`
+      : emptyWhy("bigger payouts")}`;
+  return `<p class="intro" style="margin-bottom:0">Every bet shows two chances: <b>ours</b>, and <b>what the sportsbook's price says</b>.</p>
+    ${EDGE_KEY}
+    <p class="intro">📋 Early = better prices, but lineups can still change. ✅ Confirmed lineups (about 30 min before tip-off) = most accurate pick, but prices have usually caught up.<br>
+    ⚠️ No bet is a sure thing. Treat these as ideas, not locks.</p>
+    <p class="muted" style="font-size:13px;margin:6px 0 0">Tap <b>FanDuel</b> or <b>DraftKings</b> under a bet to open it on that sportsbook's betslip. ⭐ = the sportsbook that pays more for that bet.</p>
+    ${bar}${body}
+    ${glossary(["value", "weexpect", "bookexpects", "edge", "breakeven", "spread", "total", "moneyline", "odds", "alt", "safest", "betsoon", "move", "push", "betslip"])}
+    `;
+}
+
+/* ---------- Parlay builder: pick bets, one book, one tap adds them all to that book's betslip ---------- */
+// FanDuel ids come with the predictions (x.fd). DraftKings ids are read live from DraftKings in this browser.
+state.parlay = {on: true, book: "DraftKings", picks: {}};
+state.dkSlip = null; state.dkSlipAt = 0; state.pRows = {};
+const DK_SLIP_SUBS = {"4511": null, "13202": "spread", "13201": "total"};   // game lines, alt spreads, alt totals
+const dkSubUrl = sub => DK_URL.split("4511").join(sub);
+const pickKey = x => {
+  const [away, home] = String(x.game).split(" @ "), market = String(x.market).toLowerCase(), side = String(x.side).toLowerCase();
+  const line = market === "moneyline" || x.line == null ? "" : Number(x.line).toFixed(1);
+  return `${away}@${home}|${market}|${side}|${line}`;
+};
+async function loadDKSlips() {
+  if (state.dkSlip && Date.now() - state.dkSlipAt < 60e3) return;
+  const map = {};
+  await Promise.all(Object.entries(DK_SLIP_SUBS).map(async ([sub, forced]) => {
+    try {
+      const d = await (await fetch(dkSubUrl(sub), {cache: "no-store"})).json();
+      const teams = {}, mk = {};
+      for (const e of d.events || []) {
+        if (e.status && e.status !== "NOT_STARTED") continue;
+        const side = {}; for (const p of e.participants || []) side[p.venueRole] = nickCode(p.name);
+        if (side.Home && side.Away) teams[e.id] = `${side.Away}@${side.Home}`;
+      }
+      for (const m of d.markets || []) mk[m.id] = [String(m.eventId), forced || String((m.marketType || {}).name || m.name).toLowerCase()];
+      for (const sel of d.selections || []) {
+        const [ev, market] = mk[sel.marketId] || []; const g = teams[ev];
+        const side = String(sel.outcomeType || "").toLowerCase(), o = dkNum((sel.displayOdds || {}).american);
+        if (!g || o == null || !["home", "away", "over", "under"].includes(side)) continue;
+        if (!["moneyline", "spread", "total"].includes(market)) continue;
+        const line = market === "moneyline" ? "" : (sel.points == null ? null : Number(sel.points).toFixed(1));
+        if (line === null) continue;
+        map[`${g}|${market}|${side}|${line}`] = {id: String(sel.id), odds: o};
+      }
+    } catch (_) { /* that feed failed: those picks just show "not offered" */ }
+  }));
+  state.dkSlip = map; state.dkSlipAt = Date.now();
+}
+/* Best bets: a FanDuel AND a DraftKings button on every pick (owner: "show both just in case"), each opening that
+   exact bet on that book's betslip; ⭐ on the one that pays more. FanDuel ids come with the data; DraftKings' are read
+   live from DraftKings in this browser (alternates too). */
+function slipButtons(x) {
+  if (!state.dkSlip && !state.dkSlipLoading) {
+    state.dkSlipLoading = true;
+    loadDKSlips().then(() => { state.dkSlipLoading = false; if (state.tab === "bets") render(); });
+  }
+  const d = (state.dkSlip || {})[pickKey(x)];
+  const fd = x.fd ? {o: Number(x.fd.o), url: `https://sportsbook.fanduel.com/addToBetslip?marketId=${x.fd.m}&selectionId=${x.fd.s}`} : null;
+  const dk = d ? {o: Number(d.odds), url: `https://sportsbook.draftkings.com/?outcomes=${String(d.id).replace(/#/g, "%23")}`} : null;
+  const best = fd && dk && fd.o !== dk.o ? (toDec(dk.o) > toDec(fd.o) ? "DraftKings" : "FanDuel") : null;
+  const btn = (bk, sl, cls) => sl
+    ? `<a class="slipbtn ${cls}" href="${esc(sl.url)}" target="_blank" rel="noopener">${bookLogo(bk, 13)} ${bk} ${odds(sl.o)}${best === bk ? " ⭐" : ""}</a>`
+    : `<span class="slipbtn off">${bk}: ${bk === "DraftKings" && !state.dkSlip ? "checking…" : "not offered"}</span>`;
+  return `<div class="slipbtns">${btn("FanDuel", fd, "fd")}${btn("DraftKings", dk, "dk")}</div>`;
+}
+function slipFor(x, bk) {
+  if (bk === "FanDuel") return x.fd ? {ref: x.fd, odds: x.fd.o} : null;
+  const d = (state.dkSlip || {})[pickKey(x)];
+  return d ? {ref: d, odds: d.odds} : null;
+}
+const toDec = o => o > 0 ? 1 + o / 100 : 1 + 100 / Math.abs(o);
+const toAm = d => d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d - 1));
+function parlayLink() {
+  const P = Object.values(state.parlay.picks);
+  if (state.parlay.book === "FanDuel")
+    return "https://sportsbook.fanduel.com/addToBetslip?" + P.map((p, i) => `marketId[${i}]=${p.ref.m}&selectionId[${i}]=${p.ref.s}`).join("&");
+  return "https://sportsbook.draftkings.com/?outcomes=" + P.map(p => String(p.ref.id).replace(/#/g, "%23")).join("+");
+}
+// Same game: a book won't take moneyline + spread together, or two picks from the same market (two spreads,
+// two totals, two moneylines). Total + moneyline / total + spread is a Same Game Parlay (allowed, with a note).
+function parlayConflict(k) {
+  const [game, market] = k.split("|");
+  for (const [o, p] of Object.entries(state.parlay.picks)) {
+    if (o === k) continue;
+    const [g2, m2] = o.split("|");
+    if (g2 !== game) continue;
+    if (m2 === market || (m2 !== "total" && market !== "total")) return p;
+  }
+  return null;
+}
+// has this sportsbook posted ANY odds for this game yet? (tomorrow's games often have none until the morning)
+function bookHasGame(x, bk) {
+  if (bk === "FanDuel") {
+    const g = ((state.pred || {}).games || []).find(g => g.game_id === x.game_id);
+    return !!(g && g.fd && g.fd.home_ml_close != null);
+  }
+  const pre = String(x.game).replace(" @ ", "@") + "|";
+  return Object.keys(state.dkSlip || {}).some(k => k.startsWith(pre));
+}
+// the chance the sportsbook's price for this exact pick implies (owner: show it next to ours)
+function bookExpects(x, bk) {
+  if (bk === "DraftKings" && !state.dkSlip) return "…";
+  const sl = slipFor(x, bk);
+  if (!sl) return `<span class="muted">${bookHasGame(x, bk) ? "—" : "not posted"}</span>`;
+  const be = 1 / toDec(sl.odds), better = (x.chance || 0) > be;
+  return `<span class="${better ? "" : "muted"}">${pct(be, 1)}</span>`;
+}
+// same look as Best bets: the add button is the sportsbook's colored button (FanDuel blue, DraftKings green)
+function parlayCell(x) {
+  const k = pickKey(x); state.pRows[k] = x;
+  const bk = state.parlay.book, cls = bk === "FanDuel" ? "fd" : "dk";
+  if (bk === "DraftKings" && !state.dkSlip) return `<span class="slipbtn off">${bk}: checking…</span>`;
+  const sl = slipFor(x, bk);
+  if (!sl) return `<span class="slipbtn off">${bookHasGame(x, bk) ? `Not offered at ${esc(bk)}` : `${esc(bk)}: odds not posted yet`}</span>`;
+  const inP = !!state.parlay.picks[k], clash = !inP && parlayConflict(k);
+  if (clash) return `<span class="slipbtn off" title="Sportsbooks don't allow these two in one parlay">🚫 Can't combine with ${esc(pickName(clash.x.pick))}</span>`;
+  return `<button class="slipbtn ${inP ? "added" : cls}" data-padd="${esc(k)}">${inP ? "✓ Added" : `${bookLogo(bk, 13)} + Add ${odds(sl.odds)}`}</button>`;
+}
+// owner: a label like "Good price" must hold at the price RIGHT NOW at this book; if the price moved past our
+// chance, it's just "Our pick" (what we think happens, not a good bet at this price)
+// THE betting rules (research, 21 Nov) — same as Discord's parlays.leg_margin / price_ok
+const EDGE_KEY = `<div class="edgekey"><b>Edge</b> = our chance minus the sportsbook's (we say 62%, they say 58% → <b>+4%</b>).
+  <div class="edgekey-rows"><span><b class="pos">+4%+</b> great</span><span><b class="pos">+2–4%</b> good</span>
+  <span><b class="muted">0–2%</b> about fair</span><span><b class="neg">below 0</b> skip</span></div></div>`;
+function ruleOk(c, o) {
+  const need = c < 0.55 ? 0.03 : Math.max(0.02, 0.03 * c);
+  return c >= 1 / toDec(o) + need && o >= -400 && o <= 250;
+}
+function passesRules(x) { return ruleOk(x.chance || 0, x.odds); }
+// Owner (21 Nov): safe / medium / risky = OUR chance only; the price is a separate label (same as Discord)
+function priceLabel(c, o) {
+  if (o == null) return "";
+  const gap = c - 1 / toDec(o), need = c < 0.55 ? 0.03 : Math.max(0.02, 0.03 * c);
+  return gap >= need ? `<span class="tag" style="color:var(--good)">👍 Good price</span>`
+    : gap >= 0 ? `<span class="tag">➖ Fair price</span>` : `<span class="tag" style="color:var(--bad)">⚠️ Pricey</span>`;
+}
+// Safe picks, same as the Discord safe-bets channel: 70%+, per bet the line that pays the most while still 70%+,
+// at most 3 per game and 15 in all, safest first
+function safePicks(pred) {
+  const now = Date.now(), seen = new Set(), perGame = {}, out = [];
+  const pool = (pred.safe || []).filter(x => (x.chance || 0) >= 0.70 && x.odds >= -350 &&   // owner: -350 or better
+    !((pred.games || []).find(g => g.game_id === x.game_id && (g.started || Date.parse(String(g.start_utc).replace(" ", "T")) <= now))));
+  for (const x of [...pool].sort((a, b) => a.chance - b.chance)) {
+    const k = `${x.game_id}|${String(x.market).toLowerCase()}|${String(x.side).toLowerCase()}`;
+    if (!seen.has(k)) { seen.add(k); out.push(x); }
+  }
+  return out.sort((a, b) => b.chance - a.chance).filter(x => (perGame[x.game_id] = (perGame[x.game_id] || 0) + 1) <= 3).slice(0, 15);
+}
+function liveTag(x, kind, bk) {
+  const sl = (bk !== "DraftKings" || state.dkSlip) && slipFor(x, bk);
+  // same rules as Discord: a clear edge over the live price and a price between -400 and +250
+  if (sl && kind !== "Our pick" && kind !== "Safe pick" && !ruleOk(x.chance || 0, sl.odds)) kind = "Our pick";   // safe = our chance only
+  return `<span class="tag lbl-${kind.toLowerCase().replace(/ /g, "-")}">${kind}</span>`;
+}
+function priceAt(x, bk) {
+  const sl = (bk !== "DraftKings" || state.dkSlip) && slipFor(x, bk);
+  return sl ? `<span class="price">${odds(sl.odds)} at ${book(bk)}</span>` : "";
+}
+function edgeCell(x, bk) {
+  const sl = (bk !== "DraftKings" || state.dkSlip) && slipFor(x, bk);
+  if (!sl) return `<span class="muted">—</span>`;
+  const e = 100 * ((x.chance || 0) - 1 / toDec(sl.odds));
+  return `<span class="${e >= 2 ? "pos" : e >= 0 ? "muted" : "neg"}">${e >= 0 ? "+" : ""}${e.toFixed(1)}%</span>`;
+}
+const PLEVELS = {
+  safe: {emo: "🛡️", name: "Safe", lo: 0.70, hi: 1.01, pick: "70% or higher", beat: "2", ticket: "2 legs ≈ 60% · 3 legs ≈ 47%", pays: "Pays less"},
+  medium: {emo: "⚖️", name: "Medium", lo: 0.55, hi: 0.70, pick: "55–70%", beat: "2", ticket: "2 legs ≈ 38% · 3 legs ≈ 24%", pays: "About doubles your money"},
+  risky: {emo: "🔥", name: "Risky", lo: 0.45, hi: 0.55, pick: "45–70%", beat: "2–3", ticket: "2 legs ≈ 25%", pays: "Pays a lot more"},
+};
+function ticketLevel(ch) {
+  return ch >= 0.50 ? "🛡️ <b>Safe parlay</b>" : ch >= 0.30 ? "⚖️ <b>Medium parlay</b>" : ch >= 0.20 ? "🔥 <b>Risky parlay</b>"
+    : "⚠️ <b>Long shot</b> (try fewer or safer legs)";
+}
+function parlayView() {
+  const bk = state.parlay.book, pred = state.pred || {};
+  if (bk === "DraftKings" && !state.dkSlip) loadDKSlips().then(() => state.tab === "parlay" && render());
+  const seen = new Set(), rows = [];
+  for (const [list, kind] of [[pred.bets || [], "Value bet"], [(() => { const seen = new Set();   // one line per safe bet: the one paying the most while still 70%+
+          return [...(pred.safe || [])].sort((a, b) => a.chance - b.chance).filter(x => {
+            const k = `${x.game_id}|${String(x.market).toLowerCase()}|${String(x.side).toLowerCase()}`;
+            return seen.has(k) ? false : (seen.add(k), true); }); })(), "Safe pick"], [pred.alts || [], "Bigger payout"], [pred.favorable || [], "Good price"], [pred.ours || [], "Our pick"]])
+    for (const x of list) { const k = pickKey(x); if (!seen.has(k)) { seen.add(k); rows.push([x, kind]); } }
+  rows.sort((a, b) => byPickStart(a[0], b[0]) || String(a[0].game).localeCompare(String(b[0].game)));
+  // owner: choose how safe the ticket should be (same levels as the Discord parlay channels)
+  const lv = state.parlay.level || "all", band = PLEVELS[lv];
+  // owner: a level only shows picks we rate 1+ point ABOVE this sportsbook's live price (risky = low chance, never unrealistic)
+  const beats = x => { const sl = (bk !== "DraftKings" || state.dkSlip) && slipFor(x, bk);
+                       return !!sl && ruleOk(x.chance || 0, sl.odds); };
+  // owner: a level = our chance only; one line per bet (the one that pays the most while still in the level), like Discord
+  const shownRows = !band ? rows : (() => { const seen = new Set();
+    const inBand = rows.filter(([x]) => (x.chance || 0) >= band.lo && (x.chance || 0) < band.hi).sort((a, b) => a[0].chance - b[0].chance)
+      .filter(([x]) => { const k = `${x.game_id}|${String(x.market).toLowerCase()}|${String(x.side).toLowerCase()}`;
+                         return seen.has(k) ? false : (seen.add(k), true); });
+    return inBand.sort((a, b) => byPickStart(a[0], b[0]) || String(a[0].game).localeCompare(String(b[0].game))); })();
+  const levels = Object.entries({all: {emo: "", name: "All picks"}, ...PLEVELS}).map(([k, v]) =>
+    `<button class="pbtn ${k === lv ? "book-on" : ""}" data-plevel="${k}">${v.emo} ${v.name}</button>`).join("");
+  const guide = `<div class="pguide">
+      <div class="pguide-title">Safe / Medium / Risky sort legs by our chance only. The Edge column shows if the price is good.</div>
+      <div class="pguide-row">${Object.values(PLEVELS).map(v => `<div class="pguide-card"><div class="pguide-h">${v.emo} ${v.name}</div>
+        <div>Each leg: <b>${v.pick}</b></div><div>Parlay hits: <b>${v.ticket}</b></div><div class="muted">${v.pays}</div></div>`).join("")}</div>
+    </div>`;
+  const books = ["DraftKings", "FanDuel"].map(b => `<button class="pbtn ${b === bk ? "book-on" : ""}" data-pbook="${b}">${bookLogo(b, 14)} ${b}</button>`).join("");
+  return `<p class="intro">Pick a sportsbook, tap <b>+ Add</b> on each leg, then <b>Open parlay</b>.</p>
+    ${glossary(["parlay", "sgp", "odds", "breakeven", "weexpect", "betslip", "spread", "total", "moneyline", "alt", "safest", "favorable", "value", "ours"])}
+    ${guide}
+    ${EDGE_KEY}
+    <div class="muted pkey"><b>Value bet</b> great price · <b>Safe pick</b> 70%+ · <b>Good price</b> small edge ·
+      <b>Bigger payout</b> riskier value bet · <b>Our pick</b> just our prediction, not a tip</div>
+    <div class="pbar-top">${books}</div>
+    <div class="pbar-top">${levels}</div>
+    ${shownRows.length ? `<div class="panel"><table class="data bets">
+      <tr><th>Game</th><th>Bet</th><th class="num">We expect</th><th class="num">${esc(bk)} expects</th><th class="num">Edge</th></tr>
+      ${shownRows.map(([x, kind]) => `<tr><td>${gameCell(x)}${pickWhen(x)}</td>
+        <td><div class="betline"><span><b>${esc(pickName(x.pick))}</b>${liveTag(x, kind, bk)}</span>
+          </div><div class="slipbtns">${parlayCell(x)}</div></td>
+        <td class="num pos">${pct(x.chance, 1)}</td><td class="num" data-label="${esc(bk)} expects">${bookExpects(x, bk)}</td>
+        <td class="num edge">${edgeCell(x, bk)}</td></tr>`).join("")}</table></div>`
+      : `<div class="empty">${band ? `No ${band.name.toLowerCase()} picks right now. Try another level.` : "No picks to build a parlay from right now."}</div>`}
+    ${parlayBar()}`;
+}
+function parlayBar() {
+  const P = Object.values(state.parlay.picks);
+  if (!state.parlay.on || !P.length) return "";
+  const dec = P.reduce((a, p) => a * toDec(p.odds), 1), chance = P.reduce((a, p) => a * (p.x.chance || 0), 1);
+  const games = P.map(p => p.x.game), sameGame = new Set(games).size < games.length;
+  const label = P.length === 1 ? "Open betslip" : `Open ${P.length}-leg parlay`;
+  const one = P.length === 1, priceOdds = one ? P[0].odds : toAm(dec);
+  const need = 1 / dec, gap = chance - need;               // break-even: hit this often and you neither win nor lose money
+  const verdict = gap >= 0.02 ? `<span style="color:var(--good)">✅ <b>Good value</b></span>`
+    : gap >= 0 ? `<span>➖ <b>About fair</b></span>` : `<span style="color:var(--bad)">❌ <b>Pays too little</b></span>`;
+  return `<div class="parlay-space"></div><div class="parlay-bar">
+    <div><b>🎟️ ${P.length} leg${one ? "" : "s"} at ${esc(state.parlay.book)}</b>${one ? "" : ` · ${ticketLevel(chance)}`}</div>
+    <div class="legs">${P.map(p => `<span class="leg">${esc(pickName(p.x.pick))} ${odds(p.odds)}<b data-pdel="${esc(pickKey(p.x))}">✕</b></span>`).join("")}</div>
+    <div class="sum">
+      <span>${one ? "Pays" : "Parlay pays"} <b>${odds(priceOdds)}</b> ($10 bet wins $${(10 * (dec - 1)).toFixed(2)})</span>
+      <span>We say <b>${pct(chance, 1)}</b> to hit · needs <b>${pct(need, 1)}</b> · ${verdict}</span>
+    </div>
+    <div class="sum" style="margin-top:8px">
+      <a class="btn go" href="${esc(parlayLink())}" target="_blank" rel="noopener">${label} →</a>
+      <a class="pbtn" data-pclear="1" style="text-decoration:none">Clear</a></div>
+    
+    <div class="note">${sameGame ? "Same game twice: the sportsbook sets its own price for that. " : ""}Odds can change: check the betslip.</div>
+  </div>`;
+}
+
+/* ---------- Line moves ---------- */
+const clock = iso => new Date(iso).toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
+const arrow = (a, b) => a == null || b == null || a === b ? "" : b > a ? `<span class="up">▲</span>` : `<span class="down">▼</span>`;
+const moveCell = (a, b, fmt) => b == null ? "–" :
+  `<span class="mvc">${a != null && a !== b ? `<span class="was">${fmt(a)} → </span>` : ""}<b>${fmt(b)}</b> ${arrow(a, b)}</span>`;
+const MOVE_FMT = {spread: sp, total: f1, away_ml: odds, home_ml: odds, home_spread_odds: odds, away_spread_odds: odds, over_odds: odds, under_odds: odds};
+function plainMove(c, g, books) {
+  // Plain-English name for each kind of line move, with the teams and the points line.
+  const b = books.find(x => x.book === c.book) || {};
+  const tot = f1(c.total_then ?? (b.now || {}).total);      // the lines at the time of this move
+  const spr = c.spread_then ?? (b.now || {}).spread;
+  return ({
+    spread: `${g.home} spread`,
+    total: "Total",
+    home_ml: `${g.home} moneyline`,
+    away_ml: `${g.away} moneyline`,
+    home_spread_odds: spr == null ? `${g.home} spread` : `${g.home} ${sp(spr)}`,
+    away_spread_odds: spr == null ? `${g.away} spread` : `${g.away} ${sp(-spr)}`,
+    over_odds: `Over ${tot}`,
+    under_odds: `Under ${tot}`,
+  })[c.key] || c.what;
+}
+
+// "7:31 AM" today, otherwise "Thu 7:31 AM"
+const seenAt = iso => { const d = new Date(iso), now = new Date();
+  return (d.toDateString() === now.toDateString() ? "" : d.toLocaleDateString([], {weekday: "short"}) + " ") + clock(iso); };
+function movesView() {
+  const m = state.moves || {};
+  const warn = (m.warnings || []).map(w => `<div class="warn">⚠️ ${esc(w)}</div>`).join("");
+  // owner (21 Nov): "looks horrible on mobile" + wordy -> short intro, compact cells, stacked rows on phones
+  const head = `<p class="intro">Every price change at DraftKings and FanDuel${m.checked ? ` (checked <b>${esc(m.checked)}</b>)` : ""}.
+    Grey = opening price, <b>bold</b> = now (or the last price before tip-off). <span class="up">▲</span> up <span class="down">▼</span> down.</p>
+    ${glossary(["opening", "closing", "move", "spread", "total", "moneyline", "odds"])}
+    ${warn}`;
+  const games = m.games || [];
+  if (!games.length) return head + `<div class="empty">No lines saved yet for upcoming games.</div>`;
+  // owner (21 Nov): filter by sportsbook
+  const mb = state.mvBook || "All";
+  const filt = ["All", "DraftKings", "FanDuel"].map(b => `<button class="pbtn ${b === mb ? "book-on" : ""}" data-mvbook="${b}">${b === "All" ? "All books" : `${bookLogo(b, 14)} ${b}`}</button>`).join("");
+  return head + `<div class="pbar-top" style="margin:8px 0 4px">${filt}</div><h2 class="section-title">Line moves</h2><div class="cards">${games.map((g, i) => {
+    const books = g.books.filter(b => mb === "All" || b.book === mb);
+    const opened = b => b.open_src === "book" ? "real opening line" : `opening = first price we saw, ${seenAt(b.since)}`;
+    // owner (21 Nov): "horrible and sloppy" -> one clean table per book, a column per team, Opening / Current rows per market
+    const lbl = g.started ? "Closed" : "Current", v = (x, f) => x == null ? "–" : f(x);
+    const now = (a, b2, f) => b2 == null ? "–" : `<b>${f(b2)}</b> ${arrow(a, b2)}`;
+    const neg = x => x == null ? null : -x;
+    const grp = (name, o1, n1, o2, n2, f, both = true) => `
+      <tr class="g1"><td class="mk" rowspan="2">${name}</td><td class="rl">Opened at</td>${both
+        ? `<td class="o">${v(o1, f)}</td><td class="o">${v(o2, f)}</td>` : `<td class="o" colspan="2">${v(o1, f)}</td>`}</tr>
+      <tr class="g2"><td class="rl">${lbl}</td>${both ? `<td>${now(o1, n1, f)}</td><td>${now(o2, n2, f)}</td>` : `<td colspan="2">${now(o1, n1, f)}</td>`}</tr>`;
+    const rows = books.map(b => `<div class="mvbook"><div class="mvbook-h">${book(b.book)}<span class="moved" title="${esc(opened(b))}">${b.moves || 0} change${b.moves === 1 ? "" : "s"}</span></div>
+      <table class="mvt"><tr><th></th><th></th><th>${logo(g.home, 16)} ${esc(g.home)}</th><th>${logo(g.away, 16)} ${esc(g.away)}</th></tr>
+      ${grp("Moneyline", b.first.home_ml, b.now.home_ml, b.first.away_ml, b.now.away_ml, odds)}
+      ${grp("Spread", b.first.spread, b.now.spread, neg(b.first.spread), neg(b.now.spread), sp)}
+      ${grp("Total score", b.first.total, b.now.total, null, null, f1, false)}</table></div>`).join("");
+    const log = books.flatMap(b => b.changes.map(c => ({...c, book: b.book}))).sort((x, y) => y.at.localeCompare(x.at)).slice(0, 30)
+      .map(c => `<div><time>${clock(c.at)}</time><span>${bookLogo(c.book, 14)} ${esc(plainMove(c, g, books))}: <span class="lv">${MOVE_FMT[c.key](c.from)} → <b>${MOVE_FMT[c.key](c.to)}</b> ${arrow(c.from, c.to)}</span></span></div>`).join("");
+    return `<article class="card enter" style="--i:${i};--away-c:${color(g.home)};--home-c:${color(g.away)}">
+      <div class="card-head"><div class="head-meta"><span class="badge ${g.started ? "" : "good"}">${g.started ? "Started" : "Pre-game"}</span><span class="status">🕖 ${esc(g.tip)}</span></div>
+        <div class="mu"><div class="tm">${logo(g.home, 28)}${esc(g.home)}</div><div class="score" style="font-size:22px;color:var(--muted)">vs</div><div class="tm home">${esc(g.away)}${logo(g.away, 28)}</div></div></div>
+      <div class="card-body">
+        <div class="mvbooks">${rows}</div>
+        <div class="log">${log || `<div><span style="color:var(--muted)">No changes yet.</span></div>`}</div>
+      </div></article>`;
+  }).join("")}</div>`;
+}
+
+/* ---------- Phone alerts: how to set them up ---------- */
+function alertsView() {
+  const ch = (state.pred || {}).alerts_channel || "";
+  const chBox = ch ? `<div class="ch-box"><code id="ch-name">${esc(ch)}</code>
+      <button class="btn secondary" id="ch-copy" onclick="navigator.clipboard.writeText('${esc(ch)}').then(() => { this.textContent = '✓ Copied'; setTimeout(() => this.textContent = '📋 Copy', 1500); })">📋 Copy</button></div>`
+    : `<div class="warn">The alert channel isn't available right now. Ask the site owner for the channel name.</div>`;
+  return `<p class="intro">Get a notification on your phone the moment the model finds a value bet, even when the site is closed.
+    Alerts come through <b>Discord</b> (free). Setup takes about 2 minutes.</p>
+    <h2 class="section-title">Set up Discord alerts</h2>
+    <div class="stats">
+      <div class="stat"><div class="label">Step 1</div><div class="big" style="font-size:22px">Install Discord</div>
+        <div class="note">Free app (white game-controller face on purple).
+          <a href="https://apps.apple.com/us/app/discord-chat-talk-hangout/id985746746" target="_blank" rel="noopener">Open in the App Store</a>
+          · on Android, search "Discord" in Google Play. Sign in or create a free account.</div></div>
+      <div class="stat"><div class="label">Step 2</div><div class="big" style="font-size:22px">Join the server</div>
+        <div class="note">Ask the site owner for the invite link to the private <b>NBA Model</b> server. Tap it, answer the short
+          form and wait for the owner to approve you. Alerts arrive in the <b>💰│value-bets</b> channel, and you can open this website any time with
+          <b>Sign in with Discord</b>.</div></div>
+      <div class="stat"><div class="label">Step 3</div><div class="big" style="font-size:22px">Turn on all alerts</div>
+        <div class="note">In Discord, tap the <b>NBA Model</b> server name at the top → <b>Notifications</b> → choose
+          <b>All Messages</b>. Then iPhone Settings → Notifications → Discord → turn on <b>Allow Notifications</b>
+          and <b>Lock Screen</b>.</div></div>
+    </div>
+    
+    ${glossary(["value", "edge", "weexpect", "bookexpects", "betslip", "lineups", "odds"])}
+    <h2 class="section-title">What you'll get</h2>
+    <div class="panel" style="padding:4px 16px">
+      <div class="al-row"><b>💰 Value bet</b><span>A bet where our chance is at least 4% higher than the sportsbook's. Example: "ATL ML
+        (DraftKings −230). We expect 72%, DraftKings expects 68%. Edge +4.2%." Sent about 1–2 minutes after the line moves.</span></div>
+      <div class="al-row"><b>⚠️ Edge shrinking</b><span>The line moved against a bet you got an alert for, and the edge is now less than half.</span></div>
+      <div class="al-row"><b>❌ No longer a value bet</b><span>The line moved and a bet you got a 💰 alert for isn't at least 4% higher
+        anymore. If you haven't bet it yet, skip it. If it comes back, you get a new 💰 alert.</span></div>
+      <div class="al-row"><b>✅ Lineups confirmed</b><span>Starting lineups are in for a game you got a value bet on, so the pick may change.</span></div>
+    </div>
+    `;
+}
+
+/* ---------- Line moves (part of the 📊 Results tab) ---------- */
+// Owner (21 Nov): Track record + Data merged into one tab. This section = did the line move toward our FIRST pick by tip-off.
+function lineMovesBlock() {
+  const t = state.track || {};
+  const s = (t.summary || []).filter(r => r.gap === "0+ pts");
+  const card = (label, r) => {
+    if (!r || !r.closed) return `<div class="stat"><div class="label">${label}</div><div class="big">–</div><div class="note">Waiting for games</div></div>`;
+    const v = r.avg_clv, c = v > 0.05 ? "pos" : v < -0.05 ? "neg" : "";
+    return `<div class="stat"><div class="label">${label}</div><div class="big"><span class="${c}">${v >= 0 ? "+" : ""}${v.toFixed(2)} pts</span></div>
+      <div class="note">Points moved toward our picks, on average (${r.closed.toLocaleString()} pick${r.closed > 1 ? "s" : ""}). Above 0 = good.</div></div>`;
+  };
+  const picks = (t.picks || []).filter(p => p.market !== "winner"), shown = state.lmShown || 25;
+  return `<h2 class="section-title">Did the line move our way?</h2>
+    <p class="intro">Did the sportsbook end up agreeing with our early picks?<br>
+      Example: we picked the <b>Knicks to win by more than 3</b>. By game time, the sportsbook said <b>Knicks by 5</b>.
+      So the sportsbook moved 2 points toward our pick. That's a good sign.</p>
+    <div class="stats">${card("Spreads", s.find(r => r.market === "spread"))}${card("Totals (over / under)", s.find(r => r.market === "total"))}</div>
+    ${picks.length ? `<div class="panel" style="margin-top:12px"><table class="data">
+      <tr><th>Date</th><th>Game</th><th>Our first pick</th><th class="num">Line when we picked</th><th class="num">Line at tip-off</th>
+          <th class="num">Moved our way</th></tr>
+      ${picks.slice(0, shown).map(p => {
+        // spread lines are stored as the HOME team's line: show them from the picked team's side ("BOS −13.5", not "+13.5")
+        const side = p.market === "spread" && String(p.pick).split(" ")[0] !== String(p.game).split(" @ ")[1] ? -1 : 1;
+        const fmt = v => v == null ? "–" : p.market === "spread" ? sp(side * v) : f1(v);
+        // owner (21 Nov): before the game starts we have no closing line yet: say so (no "–" / "waiting")
+        const starts = `<span class="muted">When game starts</span>`;   // owner: we only get it at game start
+        const clv = p.closed && p.clv != null ? `<span class="${p.clv > 0 ? "pos" : p.clv < 0 ? "neg" : ""}">${p.clv > 0 ? "+" : ""}${p.clv.toFixed(1)} pts</span>` : starts;
+        return `<tr><td>${esc(niceDate(p.date))}</td><td>${esc(vs(p.game))}</td><td><b>${esc(p.pick)}</b></td>
+          <td class="num">${fmt(p.line)}</td><td class="num">${p.closed ? fmt(p.close) : starts}</td><td class="num">${clv}</td></tr>`;
+      }).join("")}</table></div>
+      ${picks.length > shown ? `<button class="pbtn" data-lmmore="1" style="margin-top:10px;width:100%">Show 50 more</button>` : ""}`
+      : `<div class="empty">No picks saved yet.</div>`}`;
+}
+
+/* ---------- Accuracy ---------- */
+/* Data tab, top: our last prediction before each game, graded against the final score (results.py) —
+   the same idea as the first-basket site's track record. */
+// The full list of graded games (~700 KB) is its own file, fetched the first time the Data tab opens.
+state.resGames = null; state.resLoading = false;
+async function loadResultGames() {
+  if (state.resGames || state.resLoading) return;
+  state.resLoading = true;
+  try {
+    const r = STATIC ? await decryptData(dataKey, "results.json") : await get("/api/results");
+    state.resGames = r.games || [];
+  } catch (_) { state.resGames = []; }
+  state.resLoading = false;
+  if (state.tab === "accuracy") render();
+}
+// Owner (21 Nov): a game goes into "Latest" the second it ends. The server grades games every 5-15 min, so until then
+// the page grades a just-finished game itself, the same way results.py does: our frozen pre-game prediction vs the
+// final score (live scoreboard), at DraftKings' last pre-game line (odds tracker; else the card's line).
+function instantGames() {
+  const have = new Set((state.resGames || []).map(x => `${x.d}|${x.h}|${x.a}`)), out = [];
+  for (const g of (state.pred || {}).games || []) {
+    const L = state.live[`${g.away}@${g.home}`];
+    if (!L || L.state !== "post" || !(L.home >= 0) || have.has(`${g.date}|${g.home}|${g.away}`) || g.p_home == null) continue;
+    const tg = ((state.moves || {}).games || []).find(x => x.home === g.home && x.away === g.away) || {};
+    const n = ((tg.books || []).find(b => b.book === "DraftKings") || {}).now || {}, dk = g.dk || {};
+    const spread = n.spread ?? dk.spread_close, total = n.total ?? dk.total_close;
+    const hml = n.home_ml ?? dk.home_ml_close, aml = n.away_ml ?? dk.away_ml_close;
+    const hs = L.home, as = L.away, margin = hs - as, tot = hs + as, pickHome = g.p_home >= 0.5;
+    const lu = g.lineups || {};
+    const e = {d: g.date, s: null, h: g.home, a: g.away, hs, as, ph: Math.round(g.pred_home), pa: Math.round(g.pred_away),
+               pick: pickHome ? g.home : g.away, c: pickHome ? g.p_home : 1 - g.p_home,
+               ok: (pickHome ? g.home : g.away) === (margin > 0 ? g.home : g.away), src: "live", ev: g.event || null, instant: true,
+               lu: ["home", "away"].every(x => (lu[x] || {}).status === "Confirmed"),
+               mm: Math.abs(g.pred_margin - margin), tm: Math.abs(g.pred_total - tot)};
+    if (spread != null && g.pred_margin + spread !== 0) {
+      const sh = g.pred_margin + spread > 0, v = sh ? spread : -spread, cv = margin + spread;
+      e.sp = `${sh ? g.home : g.away} ${v > 0 ? "+" : ""}${v.toFixed(1)}`;
+      e.spr = cv === 0 ? "push" : (cv > 0) === sh ? "won" : "lost";
+    }
+    if (total != null && g.pred_total !== total) {
+      const ov = g.pred_total > total, df = tot - total;
+      e.tp = `${ov ? "Over" : "Under"} ${total.toFixed(1)}`;
+      e.tr = df === 0 ? "push" : (df > 0) === ov ? "won" : "lost";
+    }
+    const fav = hml != null && aml != null && hml !== aml ? hml < aml : spread ? spread < 0 : null;
+    e.bok = fav == null ? null : fav ? margin > 0 : margin < 0;
+    out.push(e);
+  }
+  return out;
+}
+const todayET = () => new Date().toLocaleDateString("en-CA", {timeZone: "America/New_York"});
+// today's games not finished yet (owner: "100% so far, with the games remaining today")
+const gamesLeftToday = () => ((state.pred || {}).games || []).filter(g => g.date === todayET()
+  && ((state.live[`${g.away}@${g.home}`] || {}).state !== "post")).length;
+function withInstant(SUMS, inst) {
+  const today = todayET(), zero = {won: 0, lost: 0, push: 0};
+  if (!SUMS.some(x => x.name === "Today") && ((state.pred || {}).games || []).some(g => g.date === today))
+    SUMS = [{name: "Today", games: 0, from: today, to: today, winner_right: 0, book_right: 0, book_games: 0,
+             spread: zero, total: zero, margin_miss: 0, total_miss: 0}, ...SUMS];
+  const day = inst.filter(x => x.d === today);
+  if (!day.length) return SUMS;
+  const d = today;
+  const i = SUMS.findIndex(x => x.name === "Today"), base = i >= 0 && SUMS[i].games ? SUMS[i] : null;
+  const n0 = base ? base.games : 0, n = n0 + day.length, add = (r, k) => (r || 0) + day.filter(x => x[k.split(":")[0]] === k.split(":")[1]).length;
+  const rec = (b, k) => ({won: add(b && b.won, k + ":won"), lost: add(b && b.lost, k + ":lost"), push: add(b && b.push, k + ":push")});
+  const avg = (b, k) => Math.round(10 * (((b || 0) * n0) + day.reduce((a, x) => a + x[k], 0)) / n) / 10;
+  const name = "Today";
+  const sum = {name, games: n, from: d, to: d,
+    winner_right: (base ? base.winner_right : 0) + day.filter(x => x.ok).length,
+    book_right: (base ? base.book_right : 0) + day.filter(x => x.bok === true).length,
+    book_games: (base ? base.book_games : 0) + day.filter(x => x.bok != null).length,
+    spread: rec(base && base.spread, "spr"), total: rec(base && base.total, "tr"),
+    margin_miss: avg(base && base.margin_miss, "mm"), total_miss: avg(base && base.total_miss, "tm")};
+  return i >= 0 ? SUMS.map((x, k) => k === i ? sum : x) : [sum, ...SUMS];
+}
+function resultsBlock() {
+  const R = (state.track || {}).results || {}, inst = instantGames(), SUMS = withInstant(R.summaries || [], inst),
+        G = [...inst, ...(state.resGames || [])];
+  if (!state.resGames) loadResultGames();
+  const head = `<h2 class="section-title">Our predictions vs what happened</h2>`;
+  const words = glossary(["replayed", "live", "lineups", "margin", "miss", "favored", "spread", "total", "closing", "opening", "breakeven", "push", "calib"]);
+  if (!SUMS.length) return head + words + `<div class="panel" style="padding:14px 16px"><p style="margin:0">Every prediction is saved. After each game ends,
+      our prediction made with <b>confirmed starting lineups</b> is graded here: ✓ right or ✗ wrong, for the winner, the spread and the total.
+      Past games are re-predicted every night the same way.</p></div>`;
+  const sel = SUMS.find(x => x.name === state.resSel) || SUMS.find(x => /season/.test(x.name)) || SUMS[0];
+  const S = sel;
+  const inSel = g => S.name === "All time" ? !g.instant : S.name === "Today" ? g.d === todayET() : /^Live/.test(S.name) ? g.src === "live"
+    : g.s != null && S.name.startsWith(({2025: "2024-25", 2026: "2025-26", 2027: "2026-27", 2028: "2027-28"})[g.s] || "?");
+  const list = G.filter(inSel), shown = state.resShown || 25;
+  const rate = r => { const n = r.won + r.lost; return n ? pct(r.won / n, 1) : "–"; };
+  const rec = r => `${r.won.toLocaleString()}-${r.lost.toLocaleString()}${r.push ? "-" + r.push : ""}`;
+  // plain words instead of "3-3" (owner): "3 won, 3 lost"
+  // games being played right now (live scores): they're graded once they finish (owner: "3 games are still live")
+  const isToday = S.name === "Today", left = isToday ? gamesLeftToday() : 0;
+  const soFar = isToday ? ` so far${left ? ` · ${left} game${left === 1 ? "" : "s"} left today` : ""}` : "";
+  const playing = /^Live|season|All time/.test(S.name) ? Object.values(state.live || {}).filter(v => v.state === "in").length : 0;
+  const plainRec = r => `${r.won.toLocaleString()} won, ${r.lost.toLocaleString()} lost${r.push ? `, ${r.push} tied (money back)` : ""}`;
+  const pct2 = r => { const n = r.won + r.lost; return n ? pct(r.won / n, 1) : "–"; };
+  const w = S.winner_right / S.games, bk = S.book_games ? S.book_right / S.book_games : null;
+  const cls = bk == null ? "" : w > bk + 0.0005 ? "good" : w < bk - 0.0005 ? "bad" : "";
+  const small = S.games < 100 ? `<br>Only ${S.games} game${S.games > 1 ? "s" : ""} so far, so this can still swing a lot.` : "";
+  const sw = (S.spread.won + S.spread.lost) ? S.spread.won / (S.spread.won + S.spread.lost) : null;
+  const tw = (S.total.won + S.total.lost) ? S.total.won / (S.total.won + S.total.lost) : null;
+  const beOk = x => x == null ? "" : x >= 0.524 ? "above" : "below";
+  // plain words (owner, 21 Nov): no "−110", no "favourite" jargon
+  // owner (21 Nov): "everything needs to be simple" -> two short lines
+  const prof = x => x != null && x >= 0.524;
+  const verdict = bk == null ? "" : `<div class="verdict-line ${cls}">${cls === "good" ? "✅" : cls === "bad" ? "⚠️" : "⚖️"}
+      <b>Picking winners:</b> ${cls === "good" ? "we beat the sportsbook" : cls === "bad" ? "the sportsbook did a bit better" : "tied with the sportsbook"}
+      (us ${pct(w, 1)}, sportsbook ${pct(bk, 1)}).${small}</div>`;
+  // owner (21 Nov): "beginners don't know what you mean by points" -> plain words + a real game as the example
+  const ex = list.find(g => g.ph != null && g.pa != null && g.hs != null), r0 = Math.round;
+  // owner (21 Nov): "too much chit chat" -> 3 short lines
+  const scoreMiss = `<div class="verdict-line">📏 <b>How close were our scores?</b> Off by about <b>${r0(S.margin_miss)}</b> on the winning margin
+      and <b>${r0(S.total_miss)}</b> on total points, per game.${ex ? `<br><span class="muted">e.g. ${esc(ex.h)}–${esc(ex.a)}: we said ${ex.ph}–${ex.pa}, it ended ${ex.hs}–${ex.as}</span>` : ""}</div>`;
+  const icon = ok => ok ? `<span class="mark ok">✓</span>` : `<span class="mark no">✗</span>`;
+  const tick = res => res === "won" ? "✓" : res === "lost" ? "✗" : res === "push" ? "push" : "";
+  // one finished game: score with logos, our predicted score, and a colored chip per bet (green won, red lost, gray push)
+  // owner (21 Nov): "wherever there is an X, show the actual outcome" -> why it lost, after the ✗
+  const chip = (label, res, why = "") => res ? `<span class="rchip ${res === "won" ? "ok" : res === "lost" ? "no" : "push"}${res === "lost" && why ? " why" : ""}"><span>${label}</span>
+      <b>${res === "won" ? "✓" : res === "lost" ? "✗" : "push"}</b>${res === "lost" && why ? `<span class="why">${why}</span>` : ""}</span>` : "";
+  const spWhy = g => { const t = String(g.sp).split(" ")[0], m = t === g.h ? g.hs - g.as : g.as - g.hs;
+    const n = parseFloat(String(g.sp).split(" ")[1]);
+    const need = isNaN(n) ? "" : n < 0 ? `, needed to win by more than ${-n}` : n > 0 ? `, needed to win or lose by less than ${n}` : "";
+    return (m > 0 ? `${esc(t)} won by ${m}` : m < 0 ? `${esc(t)} lost by ${-m}` : "tied") + need; };
+  const tpWhy = g => { const n = parseFloat(String(g.tp).split(" ")[1]), over = /^Over/i.test(g.tp);
+    return `${g.hs + g.as} points scored${isNaN(n) ? "" : `, needed ${over ? "more" : "fewer"} than ${n}`}`; };
+  const item = g => {
+    const hw = g.hs > g.as;
+    return `<li class="rgame ${g.ok ? "rg-ok" : "rg-no"}">
+      <div class="rg-top">
+        <span class="rg-score">${logo(g.h, 24)}<span class="${hw ? "w" : ""}">${esc(g.h)} ${g.hs}</span><span class="dash">–</span>
+          <span class="${hw ? "" : "w"}">${g.as} ${esc(g.a)}</span>${logo(g.a, 24)}</span>
+        <span class="rg-meta">${esc(niceDate(g.d))} · <span class="rtag ${g.src === "live" ? "live" : ""}">${g.src === "live" ? (g.lu ? "Live pick" : "Live pick · lineups not confirmed") : "Replayed"}</span></span>
+      </div>
+      ${g.ev ? `<div style="margin:4px 0 0">${eventBadge(g.ev)}</div>` : ""}
+      <div class="rg-pred">Our prediction: <b>${esc(g.h)} ${g.ph}–${g.pa} ${esc(g.a)}</b></div>
+      <div class="rg-chips">${chip(`🏆 ${esc(g.pick)} to win (${pct(g.c, 0)})`, g.ok ? "won" : "lost", `${esc(hw ? g.h : g.a)} won`)}${g.sp ? chip(`Spread ${esc(pickName(g.sp))}`, g.spr, spWhy(g)) : ""}${g.tp ? chip(esc(g.tp), g.tr, tpWhy(g)) : ""}</div>
+    </li>`;
+  };
+  const chips = SUMS.map(x => `<button class="subtab ${x.name === S.name ? "on" : ""}" data-ressel="${esc(x.name)}">${esc(x.name.replace(" (since we started tracking)", ""))}
+      <span class="count">${x.games.toLocaleString()}</span></button>`).join("");
+  const trained = (state.pred || {}).trained_games;
+  const learns = `<div class="verdict-line" style="margin-top:0">🧠 Trained on ${trained ? `<b>${Number(trained).toLocaleString()}</b> ` : ""}NBA games
+      since Oct 2023 (playoffs included). It keeps learning after every game.</div>`;
+  return head + learns + words + `<p class="intro"><b>Live pick</b> = predicted for real, right before tip-off. <b>Replayed</b> = an older game re-tested
+      without seeing the result.</p>
+    <div class="subtabs" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr))">${chips}</div>
+    ${isToday && !S.games ? `<div class="panel" style="padding:14px 16px;margin-top:12px">No games finished yet today.
+      ${left} game${left === 1 ? "" : "s"} left today: each one shows up here the second it ends.</div>` : `
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><div class="label">Picked the winner</div><div class="big">${pct(w, 1)}</div>
+        <div class="note">${S.winner_right.toLocaleString()} of ${S.games.toLocaleString()} right${soFar}${bk != null ? `<br>Sportsbook's picks: ${pct(bk, 1)} right` : ""}${!isToday && playing ? `<br>${playing} still playing` : ""}</div></div>
+      <div class="stat"><div class="label">Spread picks</div><div class="big">${pct2(S.spread)}</div><div class="note">${plainRec(S.spread)}${soFar}.</div></div>
+      <div class="stat"><div class="label">Over / under picks</div><div class="big">${pct2(S.total)}</div><div class="note">${plainRec(S.total)}${soFar}.</div></div>
+    </div>
+    ${scoreMiss}
+    ${verdict}`}
+    <h2 class="section-title">Every game${state.resGames ? ` (${list.length.toLocaleString()})` : ""}</h2>
+    ${state.resGames ? `<div class="panel"><ul class="results-list">${list.slice(0, shown).map(item).join("")}</ul></div>`
+      : `<div class="panel" style="padding:14px 16px;color:var(--muted)">Loading every game…</div>`}
+    ${list.length > shown ? `<button class="pbtn" data-resmore="1" style="margin-top:10px;width:100%">Show 50 more</button>` : ""}
+    ${lineMovesBlock()}
+    <h2 class="section-title">Past seasons: more details</h2>`;
+}
+
+function accuracyView() {
+  const b = state.back;
+  if (!b || !b.layers) return resultsBlock() + `<div class="empty">Run <code>python3 backtest.py --save</code> to see this page.</div>`;
+  // plain names for the backtest rows (owner, 21 Nov: beginner-friendly, no "opening/closing line", no "-110")
+  const nm = n => n.replace(" at the opening line", " · bet early").replace(" at the closing line", " · bet at tip-off")
+    .replace("Total picks", "Over / under picks");
+  const ln = n => ({"Team ratings only": "Team strength only", "+ injuries (day before)": "+ injury news",
+    "+ lineups known": "+ confirmed starting lineups (what we use)", "Sportsbook opening line": "Sportsbook's first number",
+    "Sportsbook closing line": "Sportsbook's last number before tip-off"})[n] || n;
+  const barsP = (key, floor) => {
+    const top = Math.max(...b.layers.map(x => x[key]));
+    return b.layers.map(l => `<div class="row"><span>${esc(ln(l.name))}</span><div class="track"><div class="fill ${l.name.includes("line") ? "book" : ""}"
+      style="width:${Math.max(4, 100 * (l[key] - floor) / (top - floor))}%"></div></div><span class="num"><b>${l[key].toFixed(2)}</b></span></div>`).join("");
+  };
+  return resultsBlock() + `<p class="intro">We tested the model on <b>${b.games.toLocaleString()}</b> older games (${esc(b.from)} – ${esc(b.to)}),
+    predicting each one using only what was known before it was played.<br>
+    <b>Bet early</b> = at the sportsbook's first number for that game. <b>Bet at tip-off</b> = at its last number, right before the game starts.</p>
+    <h2 class="section-title">How often our picks won (older games)</h2>
+    <div class="stats">${(b.hit_rates || []).map(h => `<div class="stat"><div class="label">${esc(nm(h.name))}</div>
+      <div class="big">${pct(h.pct, 1)}</div><div class="note">${h.games.toLocaleString()} games${/favourite/.test(h.note)
+        ? " · " + esc(h.note.replace("sportsbook favourite:", "the sportsbook's picks were right")) : ""}</div></div>`).join("")}</div>
+    <p class="intro" style="margin-top:8px">The sportsbook's number gets more accurate as game day goes on, so the same pick
+      usually does better if you bet it early. That's why "Did the line move our way?" above matters.</p>
+    <h2 class="section-title">How close were our predicted scores? (shorter bar = better)</h2>
+    <p class="intro">Each bar is how many points we were off per game, on average. Each row gives the model one more piece of information.
+      The last two rows are the sportsbook, for comparison.</p>
+    <div class="panel bars"><div class="note" style="margin:0 0 6px;color:var(--muted)">How much the winner wins by</div>${barsP("margin", 10)}</div>
+    <div class="panel bars" style="margin-top:10px"><div class="note" style="margin:0 0 6px;color:var(--muted)">Both teams' points added together</div>${barsP("total", 13.5)}</div>
+    <h2 class="section-title">Can you trust our percentages?</h2>
+    <p class="intro">If we say a team has a 75% chance, it should win about 75% of the time. When the two right-hand numbers are close, our percentages are honest.</p>
+    <div class="panel"><table class="data"><tr><th>We gave the home team</th><th class="num">Games</th><th class="num">Our average chance</th><th class="num">How often they really won</th></tr>
+      ${b.calibration.map(c => `<tr><td>${esc(c.said.replace("%-", "% to "))}</td><td class="num">${c.games}</td><td class="num">${pct(c.avg_said)}</td><td class="num"><b>${pct(c.happened)}</b></td></tr>`).join("")}
+    </table></div>
+    `;
+}
+
+/* ---------- Events ---------- */
+$("#main").addEventListener("click", e => {
+  const s = e.target.closest("[data-bets]");
+  if (s) { state.betsTab = s.dataset.bets; render(); return; }
+  const rs = e.target.closest("[data-ressel]");
+  if (rs) { state.resSel = rs.dataset.ressel; state.resShown = 25; render(); return; }
+  if (e.target.closest("[data-lmmore]")) { state.lmShown = (state.lmShown || 25) + 50; render(); return; }
+  if (e.target.closest("[data-resmore]")) { state.resShown = (state.resShown || 25) + 50; render(); return; }
+  const pb = e.target.closest("[data-pbook]");
+  if (pb) { if (pb.dataset.pbook !== state.parlay.book) { state.parlay.book = pb.dataset.pbook; state.parlay.picks = {}; }
+            render(); if (state.parlay.book === "DraftKings") loadDKSlips().then(render); return; }
+  const mvb = e.target.closest("[data-mvbook]");
+  if (mvb) { state.mvBook = mvb.dataset.mvbook; try { localStorage.setItem("mvBook", state.mvBook); } catch (_) {} render(); return; }
+  const pl = e.target.closest("[data-plevel]");
+  if (pl) { state.parlay.level = pl.dataset.plevel; render(); return; }
+  const pa = e.target.closest("[data-padd]");
+  if (pa) { const k = pa.dataset.padd, x = state.pRows[k];
+            if (state.parlay.picks[k]) delete state.parlay.picks[k];
+            else { const sl = x && slipFor(x, state.parlay.book);
+                   if (sl && !parlayConflict(k)) state.parlay.picks[k] = {x, ref: sl.ref, odds: sl.odds}; }
+            render(); return; }
+  const pd = e.target.closest("[data-pdel]");
+  if (pd) { delete state.parlay.picks[pd.dataset.pdel]; render(); return; }
+  if (e.target.closest("[data-pclear]")) { e.preventDefault(); state.parlay.picks = {}; render(); return; }
+  const d = e.target.closest("[data-day]"); if (!d) return;
+  state.day = d.dataset.day; render();
+});
+$("#tabs").addEventListener("click", e => {
+  const t = e.target.closest("[data-tab]"); if (!t) return;
+  state.tab = t.dataset.tab; try { localStorage.setItem("tab", state.tab); } catch (_) {}
+  render();
+});
+$("#refresh").addEventListener("click", async () => {
+  const btn = $("#refresh"); btn.disabled = true; $("#progress").classList.add("on");
+  await fetch("/api/refresh", {method: "POST"});
+  const poll = setInterval(async () => {
+    const s = await get("/api/refresh");
+    if (!s.running) {
+      clearInterval(poll); btn.disabled = false; $("#progress").classList.remove("on");
+      if (s.error) alert("Refresh failed: " + s.error);
+      load();
+    }
+  }, 2000);
+});
+try { state.tab = localStorage.getItem("tab") || "games"; } catch (_) {}
+if (state.tab === "track") state.tab = "accuracy";
+try { state.mvBook = localStorage.getItem("mvBook") || "All"; } catch (_) {}   // Track record + Data merged into one 📊 Results tab (21 Nov)
+load();
+setTimeout(pollScores, 1500); setInterval(pollScores, 20 * 1000);
+setInterval(load, 5 * 60 * 1000);
+setInterval(staleCheck, 60 * 1000);
+/* Warn when the picks are old: the cloud refreshes them every 15 min by day (hourly 1-6 AM ET). If that stops,
+   say so in red instead of quietly showing old lines and old injury news. */
+function staleCheck() {
+  const p = state.pred || {}, el = document.getElementById("stale");
+  if (!el || !p.made_at_iso) return;
+  const mins = (Date.now() - new Date(p.made_at_iso).getTime()) / 60000;
+  const etHour = Number(new Date().toLocaleString("en-US", {timeZone: "America/New_York", hour: "numeric", hour12: false}));
+  const limit = etHour >= 1 && etHour < 6 ? 90 : 30;
+  if (mins <= limit) { el.hidden = true; return; }
+  const age = mins < 120 ? `${Math.round(mins)} minutes` : `${Math.round(mins / 60)} hours`;
+  el.innerHTML = `⚠️ <b>These picks are ${age} old.</b> They normally refresh every 15 minutes, so the updater may be down. Lines and injury news may have changed: don't bet on these numbers until this warning goes away.`;
+  el.hidden = false;
+}
+// Website: browsers keep a copy of the page for up to 10 minutes. Check for a newer version every minute and
+// reload by itself, so nobody is stuck looking at an old design (same idea as the first-basket site).
+if (window.STATIC_SITE && window.PAGE_VERSION) setInterval(async () => {
+  try {
+    const v = (await get("version.json?t=" + Date.now())).v;
+    if (v && v !== window.PAGE_VERSION) location.replace(location.pathname + "?v=" + v);
+  } catch (_) {}
+}, 60 * 1000);
+setInterval(async () => { if (STATIC || state.tab !== "moves") return; state.moves = await get("/api/moves"); render(); }, 60 * 1000);
+</script>
+</body>
+</html>

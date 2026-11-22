@@ -67,7 +67,10 @@ jobs:
 
       - name: Install
         if: steps.kind.outputs.kind != 'skip'
-        run: pip install -q -r app/requirements.txt > /dev/null
+        run: |
+          pip install -q -r app/requirements.txt > /dev/null
+          # free text reader for #ai-slip-check betslip screenshots (22 Nov 2026); a failure here never stops the job
+          (sudo apt-get install -y -qq tesseract-ocr > /dev/null 2>&1 && echo "text reader ready") || echo "text reader not installed"
 
       - name: First time only - download every season
         if: steps.kind.outputs.kind != 'skip' && hashFiles('app/nba_model.db') == ''

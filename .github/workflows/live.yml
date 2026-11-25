@@ -94,6 +94,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_SLIP_BOT_TOKEN: ${{ secrets.SLIP_BOT_TOKEN }}     # the separate AI Slip Check bot (22 Nov 2026)
+          HC_PING_URL: ${{ secrets.HC_PING_URL }}                  # Healthchecks.io: alerts the owner if this job stops (25 Nov 2026)
           STATE_REMOTE: git@github.com:SolomonKhalili/nba-sports-model.git
         run: cd app && python -u cloud.py --${{ steps.kind.outputs.kind }} --out ../site_out 2>> run.log
 
